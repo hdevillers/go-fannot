@@ -92,3 +92,16 @@ func (r *Reader) Next() bool {
 func (r *Reader) Close() {
 	r.closer.Close()
 }
+
+func (r *Reader) Parse() *Entry {
+	if len(r.data) == 0 {
+		panic("No data read. You must call Next() method first.")
+	}
+
+	// Initialize the new entry
+	var entry Entry
+
+	// Split data by line types
+
+	return &entry
+}
