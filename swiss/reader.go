@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"os"
 	"regexp"
-	"strconv"
 
 	gzip "github.com/klauspost/pgzip"
 )
@@ -20,6 +19,12 @@ type Reader struct {
 	err     error
 	restart *regexp.Regexp
 	reend   *regexp.Regexp
+	reac    *regexp.Regexp
+	regn    *regexp.Regexp
+	relt    *regexp.Regexp
+	rede    *regexp.Regexp
+	rese    *regexp.Regexp
+	resc    *regexp.Regexp
 }
 
 func NewReader(file string) *Reader {
@@ -32,6 +37,12 @@ func NewReader(file string) *Reader {
 	// Setup regex to detecte beginning and end of an entry
 	restart := regexp.MustCompile(`^ID   `)
 	reend := regexp.MustCompile(`^\/\/$`)
+	reac := regexp.MustCompile(`;\s?`)
+	regn := regexp.MustCompile(`Name=(\w+)`)
+	relt := regexp.MustCompile(`OrderedLocusNames=([\w\-]+)`)
+	rede := regexp.MustCompile(`^RecName\: Full=`)
+	rese := regexp.MustCompile(`\s`)
+	resc := regexp.MustCompile(`\;`)
 
 	// If the dat file has a 'gz' extention, then use zlib
 	var testGZ = regexp.MustCompile(`\.gz$`)
@@ -46,6 +57,12 @@ func NewReader(file string) *Reader {
 			scanner: bufio.NewScanner(fgzip),
 			restart: restart,
 			reend:   reend,
+			reac:    reac,
+			regn:    regn,
+			relt:    relt,
+			rede:    rede,
+			rese:    rese,
+			resc:    resc,
 		}
 	} else {
 		// Regular text file
@@ -54,6 +71,12 @@ func NewReader(file string) *Reader {
 			scanner: bufio.NewScanner(f),
 			restart: restart,
 			reend:   reend,
+			reac:    reac,
+			regn:    regn,
+			relt:    relt,
+			rede:    rede,
+			rese:    rese,
+			resc:    resc,
 		}
 	}
 }
@@ -112,19 +135,19 @@ func (r *Reader) Parse() *Entry {
 
 	// Retrieve accession number
 	// NOTE: For sake of simplicify, only the first accession will be kept
-	ac := regexp.MustCompile(`;\s?`).Split(mdata["AC"], -1)
+	ac := r.reac.Split(mdata["AC"], -1)
 	entry.Access = ac[0]
 
 	// Retieve gene name and locus tag
 	if mdata["GN"] != "" {
 		// Retrieve the gene name (can be null)
-		gn := regexp.MustCompile(`Name=(\w+)`).FindStringSubmatch(mdata["GN"])
+		gn := r.regn.FindStringSubmatch(mdata["GN"])
 		if gn != nil {
 			entry.Name = gn[1]
 		}
 
 		// Retrieve the locus tag (can be null)
-		lt := regexp.MustCompile(`OrderedLocusNames=([\w\-]+)`).FindStringSubmatch(mdata["GN"])
+		lt := r.relt.FindStringSubmatch(mdata["GN"])
 		if lt != nil {
 			entry.Locus = lt[1]
 		}
@@ -133,8 +156,8 @@ func (r *Reader) Parse() *Entry {
 	// Retrieve the functional annotation
 	// NOTE: we suppose that all DE entries start with "RecName: Full="
 	if mdata["DE"] != "" {
-		de := regexp.MustCompile(`;`).Split(mdata["DE"], 2)
-		if regexp.MustCompile(`^RecName\: Full=`).MatchString(de[0]) {
+		de := r.resc.Split(mdata["DE"], 2)
+		if r.rede.MatchString(de[0]) {
 			entry.Desc = de[0][14:]
 		}
 	}
@@ -144,10 +167,10 @@ func (r *Reader) Parse() *Entry {
 	entry.Phylum = mdata["OC"]
 
 	// Protein sequence
-	entry.Sequence = regexp.MustCompile(`\s`).ReplaceAllString(mdata["  "], "")
+	entry.Sequence = r.rese.ReplaceAllString(mdata["  "], "")
 
 	// Entry evidence level
-	entry.Evidence, _ = strconv.Atoi(mdata["PE"][0:1])
+	entry.Evidence = mdata["PE"][0:1]
 
 	return &entry
 }
