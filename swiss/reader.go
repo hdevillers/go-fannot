@@ -8,10 +8,6 @@ import (
 	gzip "github.com/klauspost/pgzip"
 )
 
-type FileCloser interface {
-	Close() error
-}
-
 type Reader struct {
 	closer  FileCloser
 	scanner *bufio.Scanner
@@ -116,6 +112,16 @@ func (r *Reader) Next() bool {
 
 func (r *Reader) Close() {
 	r.closer.Close()
+}
+
+func (r *Reader) PanicOnError() {
+	if r.err != nil {
+		panic(r.err)
+	}
+}
+
+func (r *Reader) GetData() *[]string {
+	return &r.data
 }
 
 func (r *Reader) Parse() *Entry {
