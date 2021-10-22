@@ -1,6 +1,11 @@
 github.com/golang/snappy v0.0.3/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
-github.com/hdevillers/go-seq v0.0.0-20210924111036-c52007c92af4 h1:y9jon2LWk+pOT2oDGOv/YlcTcWaHd0iAGjS+vwae9r0=
+github.com/hdevillers/go-blast v1.0.0 h1:TV22Lq9+UJfFyTiLLTiqc5/7fXVYGQWfRSn8JG13Km4=
+github.com/hdevillers/go-blast v1.0.0/go.mod h1:K/56xXvdQYfE5QtMSBUMY9aZjsYlJAJRFUGqUy9LsX4=
+github.com/hdevillers/go-needle v1.0.0 h1:PdZEnng5DTPDiRmmvKPMdVpUImMxNgbElXOnv2tNAiI=
+github.com/hdevillers/go-needle v1.0.0/go.mod h1:1PtmaG9Dof/tsq3bk1tSYG+F72+NwuGmNGnUFAwLjs8=
 github.com/hdevillers/go-seq v0.0.0-20210924111036-c52007c92af4/go.mod h1:LDDRyxRx4FtOWKIm9c+T0X73GxkVBmFFugMcmQiFc4o=
+github.com/hdevillers/go-seq v1.0.0 h1:HqbGZNnsBxL6lKy+C9lAzL64DvxcV5rDg6hUyvancC0=
+github.com/hdevillers/go-seq v1.0.0/go.mod h1:LDDRyxRx4FtOWKIm9c+T0X73GxkVBmFFugMcmQiFc4o=
 github.com/klauspost/compress v1.12.3/go.mod h1:8dP1Hq4DHOhN9w426knH3Rhby4rFm6D8eO+e+Dq5Gzg=
 github.com/klauspost/compress v1.13.1 h1:wXr2uRxZTJXHLly6qhJabee5JqIhTRoLBhDOA74hDEQ=
 github.com/klauspost/compress v1.13.1/go.mod h1:8dP1Hq4DHOhN9w426knH3Rhby4rFm6D8eO+e+Dq5Gzg=
