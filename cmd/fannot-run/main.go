@@ -26,12 +26,12 @@ func main() {
 	// Parse the list of reference DB
 	fa.GetDBs(*refdb, *dirdb)
 
-	// Create the channels for multithreading
-	queryChan := make(chan int)
-	threadChan := make(chan int)
-
 REFDB:
 	for fa.NextDB() {
+		// Create the channels for multithreading
+		queryChan := make(chan int)
+		threadChan := make(chan int)
+
 		// Launch parallel go routines
 		for i := 0; i < *threads; i++ {
 			go fa.FindFunction(queryChan, threadChan)
