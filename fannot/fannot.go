@@ -35,6 +35,8 @@ type FAResult struct {
 	Organism string
 	GeneID   string
 	RefID    string
+	HitSim   float64
+	HitLR    float64
 }
 
 func NewFAResult() *FAResult {
@@ -47,10 +49,12 @@ func NewFAResult() *FAResult {
 		"Null",
 		"Null",
 		"Null",
+		0.0,
+		0.0,
 	}
 }
 
-func ParseHitDesc(hd string, hid string, rid string, hs int) *FAResult {
+func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool) *FAResult {
 	var far FAResult
 	values := strings.Split(hd, "::")
 
@@ -60,7 +64,9 @@ func ParseHitDesc(hd string, hid string, rid string, hs int) *FAResult {
 	far.GeneID = hid
 	far.RefID = rid
 
-	if hs == 2 {
+	if eq {
+		far.Note = fmt.Sprintf("uniprot|%s %s", far.GeneID, far.Organism)
+	} else if hs == 2 {
 		far.Note = fmt.Sprintf("%s uniprot|%s %s", PRE_SIM_HIGH, far.GeneID, far.Organism)
 	} else {
 		far.Note = fmt.Sprintf("%s uniprot|%s %s", PRE_SIM_NORM, far.GeneID, far.Organism)
@@ -80,10 +86,10 @@ func ParseHitDesc(hd string, hid string, rid string, hs int) *FAResult {
 
 func (far *FAResult) PrintFAResult(gid string) {
 	fmt.Printf(
-		"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\n",
+		"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%.03f\t%.03f\t%s\n",
 		gid, far.Product, far.Note, far.Organism,
 		far.GeneID, far.Locus, far.Name, far.Status,
-		far.RefID,
+		far.HitSim, far.HitLR, far.RefID,
 	)
 }
 
@@ -100,7 +106,7 @@ func getMinLengthRatio(l1, l2 int) float64 {
 
 // Print functional annotation table header
 func PrintFAResultsHeader() {
-	fmt.Println("GeneID\tProduct\tNote\tOrganism\tRefID\tRefLocus\tRefName\tStatus\tDBID")
+	fmt.Println("GeneID\tProduct\tNote\tOrganism\tRefID\tRefLocus\tRefName\tStatus\tSimilarity\tLengthRatio\tDBID")
 }
 
 // Functional annotation main structure
@@ -190,7 +196,6 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 	// Get the query id(s) from the chan
 	for qi := range queryChan {
 		/* First step: BLAST */
-		fmt.Println("index: ", qi)
 
 		// Add the query and run blast
 		blt.AddQuery(fa.Queries[qi])
@@ -245,10 +250,16 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 			}
 
 			// Get the annotation if the best hit is good enough
+			hitIsQuery := false
+			if fa.DBs[fa.DBi].Equal && bestHitSim == 100.0 {
+				hitIsQuery = true
+			}
 			if bestHitStatus > 0 {
 				// Do not investigate this gene again
 				fa.Finished[qi] = true
-				fa.Results[qi] = *ParseHitDesc(bestHitDesc, bestHitId, fa.DBs[fa.DBi].Id, bestHitStatus)
+				fa.Results[qi] = *ParseHitDesc(bestHitDesc, bestHitId, fa.DBs[fa.DBi].Id, bestHitStatus, hitIsQuery)
+				fa.Results[qi].HitSim = bestHitSim
+				fa.Results[qi].HitLR = bestHitLenRatio
 			}
 
 		}

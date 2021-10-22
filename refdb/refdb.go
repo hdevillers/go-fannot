@@ -28,9 +28,10 @@ type Refdb struct {
 	Blastdb string
 	Fasta   string
 	Nprot   int
+	Equal   bool
 }
 
-func NewRefdb(outdir, id, source, desc string) *Refdb {
+func NewRefdb(outdir, id, source, desc string, equal bool) *Refdb {
 	var rdb Refdb
 
 	// Check if the source exist
@@ -71,6 +72,7 @@ func NewRefdb(outdir, id, source, desc string) *Refdb {
 	rdb.Root = rootdir
 	rdb.Source = source
 	rdb.Desc = desc
+	rdb.Equal = equal
 
 	return &rdb
 }
