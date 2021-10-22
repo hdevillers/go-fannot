@@ -14,29 +14,93 @@ import (
 // Initialize default thresholds
 const (
 	N_BEST_HITS  int     = 3
-	MIN_COV_HIGH float64 = 90.0
+	MIN_LRA_HIGH float64 = 0.9
 	MIN_SIM_HIGH float64 = 80.0
-	MIN_COV_NORM float64 = 70.0
+	MIN_LRA_NORM float64 = 0.7
 	MIN_SIM_NORM float64 = 50.0
+	UNKNOWN_FUNC string  = "hypothetical protein"
+	PRE_SIM_HIGH string  = "higly similar to"
+	PRE_SIM_NORM string  = "similar to"
 )
 
 // DEFINING STRUCTURES
 
 // Functional Annotation Results
 type FAResult struct {
-	Product string
-	Note    string
-	GeneID  string
-	RefID   string
+	Product  string
+	Note     string
+	Locus    string
+	Name     string
+	Status   int
+	Organism string
+	GeneID   string
+	RefID    string
 }
 
 func NewFAResult() *FAResult {
 	return &FAResult{
-		"Hypothetical protein",
-		"Hypothetical protein",
+		UNKNOWN_FUNC,
+		UNKNOWN_FUNC,
+		"Null",
+		"Null",
+		0,
+		"Null",
 		"Null",
 		"Null",
 	}
+}
+
+func ParseHitDesc(hd string, hid string, rid string, hs int) *FAResult {
+	var far FAResult
+	values := strings.Split(hd, "::")
+
+	far.Product = values[0]
+	far.Organism = values[3]
+	far.Status = hs
+	far.GeneID = hid
+	far.RefID = rid
+
+	if hs == 2 {
+		far.Note = fmt.Sprintf("%s uniprot|%s %s", PRE_SIM_HIGH, far.GeneID, far.Organism)
+	} else {
+		far.Note = fmt.Sprintf("%s uniprot|%s %s", PRE_SIM_NORM, far.GeneID, far.Organism)
+	}
+	if values[2] != "" {
+		far.Note += " " + values[2]
+		far.Locus = values[2]
+	}
+	if values[1] != "" {
+		far.Note += " " + values[1]
+		far.Name = values[1]
+	}
+	far.Note += " " + far.Product
+
+	return &far
+}
+
+func (far *FAResult) PrintFAResult(gid string) {
+	fmt.Printf(
+		"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\n",
+		gid, far.Product, far.Note, far.Organism,
+		far.GeneID, far.Locus, far.Name, far.Status,
+		far.RefID,
+	)
+}
+
+// UTILS
+
+// Return the minimal length ratio
+func getMinLengthRatio(l1, l2 int) float64 {
+	if l1 < l2 {
+		return float64(l1) / float64(l2)
+	} else {
+		return float64(l2) / float64(l1)
+	}
+}
+
+// Print functional annotation table header
+func PrintFAResultsHeader() {
+	fmt.Println("GeneID\tProduct\tNote\tOrganism\tRefID\tRefLocus\tRefName\tStatus\tDBID")
 }
 
 // Functional annotation main structure
@@ -46,14 +110,14 @@ type Fannot struct {
 	DBs        []refdb.Refdb
 	DBi        int
 	DBEntries  map[string]seq.Seq
-	Continue   []bool
+	Finished   []bool
 	Results    []FAResult
 	BlastPar   blast.Param
 	NeedlePar  needle.Param
 	NBestHits  int
-	MinCovHigh float64
+	MinLraHigh float64
 	MinSimHigh float64
-	MinCovNorm float64
+	MinLraNorm float64
 	MinSimNorm float64
 }
 
@@ -67,8 +131,8 @@ func NewFannot(i string) *Fannot {
 	fa.BlastPar = *blast.NewParam()
 	fa.NeedlePar = *needle.NewParam()
 
-	// Init. results and continue variables
-	fa.Continue = make([]bool, fa.NQueries)
+	// Init. results and Finished variables
+	fa.Finished = make([]bool, fa.NQueries)
 	fa.Results = make([]FAResult, fa.NQueries)
 	for i := 0; i < fa.NQueries; i++ {
 		// Set default result (when no match is found)
@@ -77,9 +141,9 @@ func NewFannot(i string) *Fannot {
 
 	// Setup default threshold
 	fa.NBestHits = N_BEST_HITS
-	fa.MinCovHigh = MIN_COV_HIGH
+	fa.MinLraHigh = MIN_LRA_HIGH
 	fa.MinSimHigh = MIN_SIM_HIGH
-	fa.MinCovNorm = MIN_COV_NORM
+	fa.MinLraNorm = MIN_LRA_NORM
 	fa.MinSimNorm = MIN_SIM_NORM
 
 	return &fa
@@ -126,6 +190,7 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 	// Get the query id(s) from the chan
 	for qi := range queryChan {
 		/* First step: BLAST */
+		fmt.Println("index: ", qi)
 
 		// Add the query and run blast
 		blt.AddQuery(fa.Queries[qi])
@@ -139,12 +204,14 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 		if len(results.Hits) > 0 {
 			chkhit := 0 // Number if hit checked
 			bestHitId := "NULL"
+			bestHitDesc := ""
 			bestHitSim := 0.0
-			var bestHitNdl needle.Result
+			bestHitLen := 0
+			bestHitStatus := 0
 		HITS:
 			for _, hit := range results.Hits {
 				// For each hit, compute the global alignment and extract the similarity
-				hitId := hit.HitDef
+				hitId := hit.GetHitId()
 				hitSeq, test := fa.DBEntries[hitId]
 				if !test {
 					panic(fmt.Sprintf("Failed to find the hit %s in the reference DB (%s).", hitId, fa.DBs[fa.DBi].Id))
@@ -158,8 +225,9 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 
 				if ndl.Rst.GetSimilarityPct() > bestHitSim {
 					bestHitId = hitId
-					bestHitNdl = *ndl.Rst
-					bestHitSim = bestHitNdl.GetSimilarityPct()
+					bestHitDesc = hitSeq.Desc
+					bestHitLen = hitSeq.Length()
+					bestHitSim = ndl.Rst.GetSimilarityPct()
 				}
 
 				chkhit++
@@ -167,6 +235,22 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 					break HITS
 				}
 			}
+
+			// Validate the best Hit
+			bestHitLenRatio := getMinLengthRatio(bestHitLen, fa.Queries[qi].Length())
+			if bestHitSim >= fa.MinSimHigh && bestHitLenRatio >= fa.MinLraHigh {
+				bestHitStatus = 2
+			} else if bestHitSim >= fa.MinSimNorm && bestHitLenRatio >= fa.MinLraNorm {
+				bestHitStatus = 1
+			}
+
+			// Get the annotation if the best hit is good enough
+			if bestHitStatus > 0 {
+				// Do not investigate this gene again
+				fa.Finished[qi] = true
+				fa.Results[qi] = *ParseHitDesc(bestHitDesc, bestHitId, fa.DBs[fa.DBi].Id, bestHitStatus)
+			}
+
 		}
 		// Else do nothing
 
