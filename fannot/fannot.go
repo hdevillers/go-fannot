@@ -63,10 +63,13 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool) *FAResult 
 	values := strings.Split(hd, "::")
 
 	far.Product = values[0]
-	far.Organism = values[3]
 	far.Status = hs
 	far.GeneID = hid
 	far.RefID = rid
+
+	// Keep only species name (delete strain data)
+	tmpOrg := strings.Split(values[3], " (")
+	far.Organism = tmpOrg[0]
 
 	if eq {
 		far.Note = fmt.Sprintf("uniprot|%s %s", far.GeneID, far.Organism)
