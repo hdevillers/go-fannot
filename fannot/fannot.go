@@ -14,7 +14,7 @@ import (
 // Initialize default thresholds
 const (
 	N_BEST_HITS  int     = 3
-	MIN_LRA_HIGH float64 = 0.9
+	MIN_LRA_HIGH float64 = 0.8
 	MIN_SIM_HIGH float64 = 80.0
 	MIN_LRA_NORM float64 = 0.7
 	MIN_SIM_NORM float64 = 50.0
@@ -37,6 +37,8 @@ type FAResult struct {
 	RefID    string
 	HitSim   float64
 	HitLR    float64
+	HitNum   int
+	HitOW    bool
 }
 
 func NewFAResult() *FAResult {
@@ -51,6 +53,8 @@ func NewFAResult() *FAResult {
 		"Null",
 		0.0,
 		0.0,
+		0,
+		false,
 	}
 }
 
@@ -86,10 +90,11 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool) *FAResult 
 
 func (far *FAResult) PrintFAResult(gid string) {
 	fmt.Printf(
-		"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%.03f\t%.03f\t%s\n",
+		"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%.03f\t%.03f\t%s\t%d\t%t\n",
 		gid, far.Product, far.Note, far.Organism,
 		far.GeneID, far.Locus, far.Name, far.Status,
-		far.HitSim, far.HitLR, far.RefID,
+		far.HitSim, far.HitLR, far.RefID, far.HitNum,
+		far.HitOW,
 	)
 }
 
@@ -106,7 +111,7 @@ func getMinLengthRatio(l1, l2 int) float64 {
 
 // Print functional annotation table header
 func PrintFAResultsHeader() {
-	fmt.Println("GeneID\tProduct\tNote\tOrganism\tRefID\tRefLocus\tRefName\tStatus\tSimilarity\tLengthRatio\tDBID")
+	fmt.Println("GeneID\tProduct\tNote\tOrganism\tRefID\tRefLocus\tRefName\tStatus\tSimilarity\tLengthRatio\tDBID\tHitNum\tOverWritten")
 }
 
 // Functional annotation main structure
@@ -213,6 +218,7 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 			bestHitSim := 0.0
 			bestHitLen := 0
 			bestHitStatus := 0
+			bestHitNum := 0
 		HITS:
 			for _, hit := range results.Hits {
 				// For each hit, compute the global alignment and extract the similarity
@@ -233,6 +239,7 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 					bestHitDesc = hitSeq.Desc
 					bestHitLen = hitSeq.Length()
 					bestHitSim = ndl.Rst.GetSimilarityPct()
+					bestHitNum = chkhit + 1
 				}
 
 				chkhit++
@@ -255,11 +262,29 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 				hitIsQuery = true
 			}
 			if bestHitStatus > 0 {
-				// Do not investigate this gene again
-				fa.Finished[qi] = true
-				fa.Results[qi] = *ParseHitDesc(bestHitDesc, bestHitId, fa.DBs[fa.DBi].Id, bestHitStatus, hitIsQuery)
-				fa.Results[qi].HitSim = bestHitSim
-				fa.Results[qi].HitLR = bestHitLenRatio
+				// If no annotation yet
+				if !fa.Finished[qi] {
+					// Set an annotation to this protein
+					fa.Finished[qi] = true
+					fa.Results[qi] = *ParseHitDesc(bestHitDesc, bestHitId, fa.DBs[fa.DBi].Id, bestHitStatus, hitIsQuery)
+					fa.Results[qi].HitSim = bestHitSim
+					fa.Results[qi].HitLR = bestHitLenRatio
+					fa.Results[qi].HitNum = bestHitNum
+				} else if fa.DBs[fa.DBi].OverWrite {
+					// The current DB allows overwrite
+					// An overwrite is possible only if the stored
+					// annotation is "similar" and the new hit is
+					// better.
+					if fa.Results[qi].Status == 1 {
+						if bestHitSim > fa.Results[qi].HitSim && bestHitLenRatio > fa.Results[qi].HitLR {
+							fa.Results[qi] = *ParseHitDesc(bestHitDesc, bestHitId, fa.DBs[fa.DBi].Id, bestHitStatus, hitIsQuery)
+							fa.Results[qi].HitSim = bestHitSim
+							fa.Results[qi].HitLR = bestHitLenRatio
+							fa.Results[qi].HitNum = bestHitNum
+							fa.Results[qi].HitOW = true
+						}
+					}
+				}
 			}
 
 		}
