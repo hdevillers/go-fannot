@@ -21,17 +21,18 @@ const (
 )
 
 type Refdb struct {
-	Id      string
-	Desc    string
-	Root    string
-	Source  string
-	Blastdb string
-	Fasta   string
-	Nprot   int
-	Equal   bool
+	Id        string
+	Desc      string
+	Root      string
+	Source    string
+	Blastdb   string
+	Fasta     string
+	Nprot     int
+	Equal     bool // Indicate if the DB contain proteins of the query
+	OverWrite bool // Indicate if annotations from the DB can overwrite "similar" annotations
 }
 
-func NewRefdb(outdir, id, source, desc string, equal bool) *Refdb {
+func NewRefdb(outdir, id, source, desc string, equal bool, ow bool) *Refdb {
 	var rdb Refdb
 
 	// Check if the source exist
@@ -73,6 +74,7 @@ func NewRefdb(outdir, id, source, desc string, equal bool) *Refdb {
 	rdb.Source = source
 	rdb.Desc = desc
 	rdb.Equal = equal
+	rdb.OverWrite = ow
 
 	return &rdb
 }

@@ -10,7 +10,8 @@ func main() {
 	input := flag.String("input", "", "Input swissProt data file.")
 	name := flag.String("id", "", "Name of the reference database.")
 	outdir := flag.String("outdir", ".", "Output directory.")
-	equal := flag.Bool("equal", false, "Indicate the the reference contains genes from the query.")
+	equal := flag.Bool("equal", false, "Indicate that the reference contains genes from the query.")
+	ow := flag.Bool("overwrite", false, "Indicate that annotations from this DB can overwrite annotation from other DB.")
 	desc := flag.String("desc", "No description", "Database description.")
 	flag.Parse()
 
@@ -22,7 +23,7 @@ func main() {
 	}
 
 	// Create the refdb object
-	rdb := refdb.NewRefdb(*outdir, *name, *input, *desc, *equal)
+	rdb := refdb.NewRefdb(*outdir, *name, *input, *desc, *equal, *ow)
 
 	// Load the data
 	rdb.LoadSource()
