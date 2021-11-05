@@ -71,6 +71,11 @@ REFDB:
 		}
 	}
 
+	// Complete with IPS annotation if provided
+	if *ipsin != "" {
+		fa.AddIpsAnnot()
+	}
+
 	// Printout the results
 	fannot.PrintFAResultsHeader()
 	for i := 0; i < fa.NQueries; i++ {

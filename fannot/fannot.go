@@ -98,9 +98,10 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool) *FAResult 
 
 func (far *FAResult) PrintFAResult(gid string) {
 	fmt.Printf(
-		"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%.03f\t%.03f\t%s\t%d\t%t\n",
+		"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%.03f\t%.03f\t%s\t%d\t%t\n",
 		gid, far.Product, far.Note, far.Organism,
-		far.GeneID, far.Locus, far.Name, far.Status,
+		far.GeneID, far.Locus, far.Name,
+		strings.Join(far.IpsId, ","), strings.Join(far.IpsAnnot, "; "), far.Status,
 		far.HitSim, far.HitLR, far.RefID, far.HitNum,
 		far.HitOW,
 	)
@@ -119,7 +120,7 @@ func getMinLengthRatio(l1, l2 int) float64 {
 
 // Print functional annotation table header
 func PrintFAResultsHeader() {
-	fmt.Println("GeneID\tProduct\tNote\tOrganism\tRefID\tRefLocus\tRefName\tStatus\tSimilarity\tLengthRatio\tDBID\tHitNum\tOverWritten")
+	fmt.Println("GeneID\tProduct\tNote\tOrganism\tRefID\tRefLocus\tRefName\tIPSID\tIPSAnnot\tStatus\tSimilarity\tLengthRatio\tDBID\tHitNum\tOverWritten")
 }
 
 // Functional annotation main structure
@@ -319,7 +320,15 @@ func (fa *Fannot) AddIpsAnnot() {
 		// Get ips entries for this gene (if exists)
 		ips, ok := fa.Ips.Data[gid]
 		if ok {
+			for ipr, ann := range ips.KeyValue {
+				fa.Results[qi].IpsId = append(fa.Results[qi].IpsId, ipr)
+				fa.Results[qi].IpsAnnot = append(fa.Results[qi].IpsAnnot, ann)
+			}
 
+			// If no homology found, then add IpsAnnot to /note qualifier
+			if fa.Results[qi].Status == 0 {
+				fa.Results[qi].Note += ", InterProScan predictions: " + strings.Join(fa.Results[qi].IpsAnnot, "; ")
+			}
 		}
 	}
 }
