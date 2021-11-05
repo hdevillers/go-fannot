@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/hdevillers/go-blast"
+	"github.com/hdevillers/go-fannot/ips"
 	"github.com/hdevillers/go-fannot/refdb"
 	"github.com/hdevillers/go-needle"
 	"github.com/hdevillers/go-seq/seq"
@@ -39,6 +40,8 @@ type FAResult struct {
 	HitLR    float64
 	HitNum   int
 	HitOW    bool
+	IpsId    []string
+	IpsAnnot []string
 }
 
 func NewFAResult() *FAResult {
@@ -55,6 +58,8 @@ func NewFAResult() *FAResult {
 		0.0,
 		0,
 		false,
+		make([]string, 0),
+		make([]string, 0),
 	}
 }
 
@@ -128,6 +133,7 @@ type Fannot struct {
 	Results    []FAResult
 	BlastPar   blast.Param
 	NeedlePar  needle.Param
+	Ips        ips.Ips
 	NBestHits  int
 	MinLraHigh float64
 	MinSimHigh float64
@@ -144,6 +150,9 @@ func NewFannot(i string) *Fannot {
 	// Init. BLAST and NEEDLE parameter setings
 	fa.BlastPar = *blast.NewParam()
 	fa.NeedlePar = *needle.NewParam()
+
+	// Init. the IPS object
+	fa.Ips = *ips.NewIps()
 
 	// Init. results and Finished variables
 	fa.Finished = make([]bool, fa.NQueries)
@@ -299,4 +308,18 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 
 	// Terminate the thread
 	threadChan <- 1
+}
+
+func (fa *Fannot) AddIpsAnnot() {
+	// Check each results
+	for qi := 0; qi < fa.NQueries; qi++ {
+		// Get gene ID
+		gid := fa.Queries[qi].Id
+
+		// Get ips entries for this gene (if exists)
+		ips, ok := fa.Ips.Data[gid]
+		if ok {
+
+		}
+	}
 }
