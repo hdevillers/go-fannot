@@ -27,14 +27,14 @@ func NewIpsEntry(gn string) *IpsEntry {
 }
 
 type Ips struct {
-	Data   map[string]IpsEntry
+	Data   map[string]*IpsEntry
 	NGenes int
 	Evalue float64
 }
 
 func NewIps() *Ips {
 	var i Ips
-	i.Data = make(map[string]IpsEntry)
+	i.Data = make(map[string]*IpsEntry)
 	i.NGenes = 0
 	return &i
 }
@@ -81,7 +81,7 @@ func (i *Ips) LoadIpsData(f string) error {
 				if geneId != elem[0] {
 					// Create a new entry for the gene
 					geneId = elem[0]
-					i.Data[geneId] = *NewIpsEntry(geneId)
+					i.Data[geneId] = NewIpsEntry(geneId)
 					i.NGenes++
 				}
 
@@ -94,8 +94,6 @@ func (i *Ips) LoadIpsData(f string) error {
 				}
 			}
 		}
-
 	}
-
 	return nil
 }
