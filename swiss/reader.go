@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"os"
 	"regexp"
+	"strings"
 
 	gzip "github.com/klauspost/pgzip"
 )
@@ -164,7 +165,9 @@ func (r *Reader) Parse() *Entry {
 	if mdata["DE"] != "" {
 		de := r.resc.Split(mdata["DE"], 2)
 		if r.rede.MatchString(de[0]) {
-			entry.Desc = de[0][14:]
+			// Delete useless accession numbers (ex. {ECO:XXXX})
+			tmpDesc := strings.Split(de[0][14:], " {")
+			entry.Desc = tmpDesc[0]
 		}
 	}
 
