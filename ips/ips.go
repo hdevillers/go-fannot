@@ -36,6 +36,7 @@ func NewIps() *Ips {
 	var i Ips
 	i.Data = make(map[string]*IpsEntry)
 	i.NGenes = 0
+	i.Evalue = D_MAX_EVALUE
 	return &i
 }
 
