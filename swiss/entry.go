@@ -10,6 +10,7 @@ type Entry struct {
 	Name     string
 	Locus    string
 	Desc     string
+	Length   int
 	Organism string
 	Phylum   string
 	Sequence string
@@ -21,6 +22,7 @@ func (e *Entry) Info() {
 	fmt.Printf("Gene name:\t%s\n", e.Name)
 	fmt.Printf("Locus tag:\t%s\n", e.Locus)
 	fmt.Printf("Description:\t%s\n", e.Desc)
+	fmt.Printf("Length (aa):\t%d\n", e.Length)
 	fmt.Printf("Organism:\t%s\n", e.Organism)
 	fmt.Printf("Phylum: \t%s\n", e.Phylum)
 	fmt.Printf("Evidence:\t%s\n", e.Evidence)

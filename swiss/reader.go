@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 
 	gzip "github.com/klauspost/pgzip"
@@ -138,6 +139,17 @@ func (r *Reader) Parse() *Entry {
 	for _, line := range r.data {
 		key := line[0:2]
 		mdata[key] += line[5:]
+	}
+
+	// Retrieve the length of the protein
+	le := regexp.MustCompile(`(\d+) AA`).FindStringSubmatch(mdata["ID"])
+	if len(le) != 0 {
+		panic("Failed to retrieve the length of the protein.")
+	}
+	var err error
+	entry.Length, err = strconv.Atoi(le[0])
+	if err != nil {
+		panic(err)
 	}
 
 	// Retrieve accession number
