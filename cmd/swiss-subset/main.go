@@ -20,6 +20,7 @@ func main() {
 	eskip := flag.String("E", "", "Evidence skip instruction (regex).")
 	tkeep := flag.String("t", "", "Taxonomy keep instruction (regex).")
 	tskip := flag.String("T", "", "Taxonomy skip instruction (regex).")
+	lmin := flag.Int("l", 30, "Minimal protein length (aa).")
 	flag.Parse()
 
 	if *input == "" {
@@ -52,6 +53,10 @@ func main() {
 		// Parse the entry
 		e := swr.Parse()
 		tot++
+
+		if e.Length < *lmin {
+			continue
+		}
 
 		if *eskip != "" {
 			if e.TestEvidence(*eskip) {
