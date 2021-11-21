@@ -2,6 +2,7 @@ package swiss
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"regexp"
 	"strconv"
@@ -143,11 +144,11 @@ func (r *Reader) Parse() *Entry {
 
 	// Retrieve the length of the protein
 	le := regexp.MustCompile(`(\d+) AA`).FindStringSubmatch(mdata["ID"])
-	if len(le) != 0 {
-		panic("Failed to retrieve the length of the protein.")
+	if len(le) != 2 {
+		panic(fmt.Sprintf("Failed to retrieve the length of the protein (%s).", mdata["ID"]))
 	}
 	var err error
-	entry.Length, err = strconv.Atoi(le[0])
+	entry.Length, err = strconv.Atoi(le[1])
 	if err != nil {
 		panic(err)
 	}
