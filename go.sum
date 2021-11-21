@@ -3,6 +3,8 @@ github.com/hdevillers/go-blast v1.0.0 h1:TV22Lq9+UJfFyTiLLTiqc5/7fXVYGQWfRSn8JG1
 github.com/hdevillers/go-blast v1.0.0/go.mod h1:K/56xXvdQYfE5QtMSBUMY9aZjsYlJAJRFUGqUy9LsX4=
 github.com/hdevillers/go-needle v1.0.0 h1:PdZEnng5DTPDiRmmvKPMdVpUImMxNgbElXOnv2tNAiI=
 github.com/hdevillers/go-needle v1.0.0/go.mod h1:1PtmaG9Dof/tsq3bk1tSYG+F72+NwuGmNGnUFAwLjs8=
+github.com/hdevillers/go-needle v1.0.1 h1:8M7sT1HsnxRVocvH3z9rlnzvcBYsu8zYgEmU/QWH7ho=
+github.com/hdevillers/go-needle v1.0.1/go.mod h1:1PtmaG9Dof/tsq3bk1tSYG+F72+NwuGmNGnUFAwLjs8=
 github.com/hdevillers/go-seq v0.0.0-20210924111036-c52007c92af4/go.mod h1:LDDRyxRx4FtOWKIm9c+T0X73GxkVBmFFugMcmQiFc4o=
 github.com/hdevillers/go-seq v1.0.0 h1:HqbGZNnsBxL6lKy+C9lAzL64DvxcV5rDg6hUyvancC0=
 github.com/hdevillers/go-seq v1.0.0/go.mod h1:LDDRyxRx4FtOWKIm9c+T0X73GxkVBmFFugMcmQiFc4o=
