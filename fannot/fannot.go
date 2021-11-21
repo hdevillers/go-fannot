@@ -244,7 +244,7 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 				ndl.Par = &fa.NeedlePar
 				err = ndl.Align()
 				if err != nil {
-					panic(err)
+					panic(fmt.Sprintf("Failed to align query %s againt ref %s, error: %s.", fa.Queries[qi].Id, hitId, err.Error()))
 				}
 
 				if ndl.Rst.GetSimilarityPct() > bestHitSim {
