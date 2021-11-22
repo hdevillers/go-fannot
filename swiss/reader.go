@@ -158,6 +158,32 @@ func (r *Reader) Parse() *Entry {
 	ac := r.reac.Split(mdata["AC"], -1)
 	entry.Access = ac[0]
 
+	// Get information from CC lines
+	if mdata["CC"] != "" {
+		// Split by "-!- "
+		cc := strings.Split(mdata["CC"], "-!- ")
+
+		// Scan each cc type
+	CCVAL:
+		for _, ccv := range cc {
+			// Look for FUNCTION
+			if len(ccv) > 5 {
+				if ccv[0:5] == "FUNCT" {
+					fmt.Println("Raw: ", ccv)
+					// Delete duplicated spaces
+					ccv = regexp.MustCompile(`    `).ReplaceAllString(ccv[11:], " ")
+					// Delete pubmed indications
+					ccv = regexp.MustCompile(` \(Pub[\w\d\:\, ]+\)`).ReplaceAllString(ccv, "")
+					// Delete the possible {ECO:...} at the end
+					ccv = strings.Split(ccv, " {")[0]
+					fmt.Println("Post: ", ccv)
+					entry.Function = ccv
+					break CCVAL
+				}
+			}
+		}
+	}
+
 	// Retieve gene name and locus tag
 	if mdata["GN"] != "" {
 		// Retrieve the gene name (can be null)
@@ -195,4 +221,24 @@ func (r *Reader) Parse() *Entry {
 	entry.Evidence = mdata["PE"][0:1]
 
 	return &entry
+}
+
+func commentFunctionCleanup(ccv string) string {
+	// Delete duplicated spaces
+	ccv = regexp.MustCompile(`    `).ReplaceAllString(ccv[11:], " ")
+
+	// Delete pubmed indications
+	ccv = regexp.MustCompile(` \(Pub[\w\d\:\, ]+\)`).ReplaceAllString(ccv, "")
+
+	// Delete the possible {ECO:...} at the end
+	ccv = strings.Split(ccv, " {")[0]
+
+	// Split sentences
+	sen := strings.Split(ccv, ". ")
+	for i := range sen {
+		if regexp.MustCompile(`[A-Z][a-z ]`).MatchString(sen[i][0:2]) {
+			sen[i][0] = []byte(strings.ToLower(sen[i][0:1]))[0]
+		}
+	}
+
 }
