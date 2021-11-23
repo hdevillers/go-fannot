@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode"
 
 	gzip "github.com/klauspost/pgzip"
 )
@@ -169,14 +170,7 @@ func (r *Reader) Parse() *Entry {
 			// Look for FUNCTION
 			if len(ccv) > 5 {
 				if ccv[0:5] == "FUNCT" {
-					fmt.Println("Raw: ", ccv)
-					// Delete duplicated spaces
-					ccv = regexp.MustCompile(`    `).ReplaceAllString(ccv[11:], " ")
-					// Delete pubmed indications
-					ccv = regexp.MustCompile(` \(Pub[\w\d\:\, ]+\)`).ReplaceAllString(ccv, "")
-					// Delete the possible {ECO:...} at the end
-					ccv = strings.Split(ccv, " {")[0]
-					fmt.Println("Post: ", ccv)
+					ccv = commentFunctionCleanup(ccv)
 					entry.Function = ccv
 					break CCVAL
 				}
@@ -225,7 +219,7 @@ func (r *Reader) Parse() *Entry {
 
 func commentFunctionCleanup(ccv string) string {
 	// Delete duplicated spaces
-	ccv = regexp.MustCompile(`    `).ReplaceAllString(ccv[11:], " ")
+	ccv = regexp.MustCompile(`    `).ReplaceAllString(ccv[10:], " ")
 
 	// Delete pubmed indications
 	ccv = regexp.MustCompile(` \(Pub[\w\d\:\, ]+\)`).ReplaceAllString(ccv, "")
@@ -237,8 +231,20 @@ func commentFunctionCleanup(ccv string) string {
 	sen := strings.Split(ccv, ". ")
 	for i := range sen {
 		if regexp.MustCompile(`[A-Z][a-z ]`).MatchString(sen[i][0:2]) {
-			sen[i][0] = []byte(strings.ToLower(sen[i][0:1]))[0]
+			tmp := []rune(sen[i])
+			tmp[0] = unicode.ToLower(tmp[0])
+			sen[i] = string(tmp)
 		}
 	}
 
+	// Join sentences
+	out := strings.Join(sen, "; ")
+
+	// Delete (By similarity) informations
+	out = regexp.MustCompile(` \(By similarity\)`).ReplaceAllString(out, "")
+
+	// Delete final point
+	out = regexp.MustCompile(`\.$`).ReplaceAllString(out, "")
+
+	return out
 }
