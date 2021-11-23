@@ -96,7 +96,7 @@ func (r *Refdb) LoadSource() {
 		swr.PanicOnError()
 		ne++
 
-		desc := e.Desc + "::" + e.Name + "::" + e.Locus + "::" + e.Organism
+		desc := e.Desc + "::" + e.Name + "::" + e.Locus + "::" + e.Organism + "::" + e.Function
 		nseq := seq.NewSeq(e.Access)
 		nseq.Desc = desc
 		nseq.Sequence = []byte(e.Sequence)

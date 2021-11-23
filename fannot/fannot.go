@@ -2,7 +2,9 @@ package fannot
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
+	"unicode"
 
 	"github.com/hdevillers/go-blast"
 	"github.com/hdevillers/go-fannot/ips"
@@ -72,6 +74,13 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool) *FAResult 
 	far.GeneID = hid
 	far.RefID = rid
 
+	// Clean up Product
+	if regexp.MustCompile(`^[A-Z][a-z ]`).MatchString(far.Product) {
+		tmp := []rune(far.Product)
+		tmp[0] = unicode.ToLower(tmp[0])
+		far.Product = string(tmp)
+	}
+
 	// Keep only species name (delete strain data)
 	tmpOrg := strings.Split(values[3], " (")
 	far.Organism = tmpOrg[0]
@@ -86,12 +95,19 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool) *FAResult 
 	if values[2] != "" {
 		far.Note += " " + values[2]
 		far.Locus = values[2]
+		// Clean up product: remove locus tag references
+		far.Product = regexp.MustCompile(" "+far.Locus).ReplaceAllString(far.Product, "")
 	}
 	if values[1] != "" {
 		far.Note += " " + values[1]
 		far.Name = values[1]
 	}
-	far.Note += " " + far.Product
+
+	if values[4] != "" {
+		far.Note += ", " + values[4]
+	} else {
+		far.Note += ", " + far.Product
+	}
 
 	return &far
 }
