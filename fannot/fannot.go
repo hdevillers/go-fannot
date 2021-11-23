@@ -101,6 +101,11 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool) *FAResult 
 	if values[1] != "" {
 		far.Note += " " + values[1]
 		far.Name = values[1]
+		reName := regexp.MustCompile(" " + far.Name)
+		if reName.MatchString(far.Product) {
+			protName := strings.Title(strings.ToLower(far.Name)) + "p"
+			far.Product = reName.ReplaceAllString(far.Product, protName)
+		}
 	}
 
 	if values[4] != "" {
