@@ -16,14 +16,16 @@ import (
 
 // Initialize default thresholds
 const (
-	N_BEST_HITS  int     = 3
-	MIN_LRA_HIGH float64 = 0.8
-	MIN_SIM_HIGH float64 = 80.0
-	MIN_LRA_NORM float64 = 0.7
-	MIN_SIM_NORM float64 = 50.0
-	UNKNOWN_FUNC string  = "hypothetical protein"
-	PRE_SIM_HIGH string  = "higly similar to"
-	PRE_SIM_NORM string  = "similar to"
+	N_BEST_HITS   int     = 3
+	MIN_LRA_HIGH  float64 = 0.8
+	MIN_SIM_HIGH  float64 = 80.0
+	MIN_LRA_NORM  float64 = 0.7
+	MIN_SIM_NORM  float64 = 50.0
+	UNKNOWN_FUNC  string  = "hypothetical protein"
+	PRE_SIM_HIGH  string  = "higly similar to"
+	PRE_SIM_NORM  string  = "similar to"
+	REVIEWED_DB   string  = "uniprot"
+	UNREVIEWED_DB string  = "trembl"
 )
 
 // DEFINING STRUCTURES
@@ -37,6 +39,7 @@ type FAResult struct {
 	Status   int
 	Organism string
 	GeneID   string
+	CopyGID  bool
 	RefID    string
 	HitSim   float64
 	HitLR    float64
@@ -44,6 +47,7 @@ type FAResult struct {
 	HitOW    bool
 	IpsId    []string
 	IpsAnnot []string
+	Reviewed bool
 }
 
 func NewFAResult() *FAResult {
@@ -55,6 +59,7 @@ func NewFAResult() *FAResult {
 		0,
 		"Null",
 		"Null",
+		false,
 		"Null",
 		0.0,
 		0.0,
@@ -62,10 +67,11 @@ func NewFAResult() *FAResult {
 		false,
 		make([]string, 0),
 		make([]string, 0),
+		false,
 	}
 }
 
-func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool) *FAResult {
+func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool, re bool, gn bool) *FAResult {
 	var far FAResult
 	values := strings.Split(hd, "::")
 
@@ -73,6 +79,8 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool) *FAResult 
 	far.Status = hs
 	far.GeneID = hid
 	far.RefID = rid
+	far.CopyGID = gn
+	far.Reviewed = re
 
 	// Clean up Product
 	if regexp.MustCompile(`^[A-Z][a-z ]`).MatchString(far.Product) {
@@ -85,12 +93,18 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool) *FAResult 
 	tmpOrg := strings.Split(values[3], " (")
 	far.Organism = tmpOrg[0]
 
+	// Db type
+	dbType := UNREVIEWED_DB
+	if re {
+		dbType = REVIEWED_DB
+	}
+
 	if eq {
-		far.Note = fmt.Sprintf("uniprot|%s %s", far.GeneID, far.Organism)
+		far.Note = fmt.Sprintf("%s|%s %s", dbType, far.GeneID, far.Organism)
 	} else if hs == 2 {
-		far.Note = fmt.Sprintf("%s uniprot|%s %s", PRE_SIM_HIGH, far.GeneID, far.Organism)
+		far.Note = fmt.Sprintf("%s %s|%s %s", PRE_SIM_HIGH, dbType, far.GeneID, far.Organism)
 	} else {
-		far.Note = fmt.Sprintf("%s uniprot|%s %s", PRE_SIM_NORM, far.GeneID, far.Organism)
+		far.Note = fmt.Sprintf("%s %s|%s %s", PRE_SIM_NORM, dbType, far.GeneID, far.Organism)
 	}
 	if values[2] != "" {
 		far.Note += " " + values[2]
@@ -104,7 +118,14 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool) *FAResult 
 		reName := regexp.MustCompile(" " + far.Name)
 		if reName.MatchString(far.Product) {
 			protName := strings.Title(strings.ToLower(far.Name)) + "p"
-			far.Product = reName.ReplaceAllString(far.Product, " " + protName)
+			far.Product = reName.ReplaceAllString(far.Product, " "+protName)
+		}
+	}
+
+	// Add putative to the product if the gene name should not be transfered
+	if !gn {
+		if !regexp.MustCompile(`^putative`).MatchString(far.Note) {
+			far.Note = "putative " + far.Note
 		}
 	}
 
@@ -300,7 +321,7 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 				if !fa.Finished[qi] {
 					// Set an annotation to this protein
 					fa.Finished[qi] = true
-					fa.Results[qi] = *ParseHitDesc(bestHitDesc, bestHitId, fa.DBs[fa.DBi].Id, bestHitStatus, hitIsQuery)
+					fa.Results[qi] = *ParseHitDesc(bestHitDesc, bestHitId, fa.DBs[fa.DBi].Id, bestHitStatus, hitIsQuery, fa.DBs[fa.DBi].Reviewed, fa.DBs[fa.DBi].GeneName)
 					fa.Results[qi].HitSim = bestHitSim
 					fa.Results[qi].HitLR = bestHitLenRatio
 					fa.Results[qi].HitNum = bestHitNum
@@ -311,7 +332,7 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 					// better.
 					if fa.Results[qi].Status == 1 {
 						if bestHitSim > fa.Results[qi].HitSim && bestHitLenRatio > fa.Results[qi].HitLR {
-							fa.Results[qi] = *ParseHitDesc(bestHitDesc, bestHitId, fa.DBs[fa.DBi].Id, bestHitStatus, hitIsQuery)
+							fa.Results[qi] = *ParseHitDesc(bestHitDesc, bestHitId, fa.DBs[fa.DBi].Id, bestHitStatus, hitIsQuery, fa.DBs[fa.DBi].Reviewed, fa.DBs[fa.DBi].GeneName)
 							fa.Results[qi].HitSim = bestHitSim
 							fa.Results[qi].HitLR = bestHitLenRatio
 							fa.Results[qi].HitNum = bestHitNum

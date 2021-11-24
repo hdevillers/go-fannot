@@ -51,7 +51,7 @@ func main() {
 
 	for swr.Next() {
 		// Parse the entry
-		e := swr.Parse()
+		e := swr.LightParse()
 		tot++
 
 		if e.Length < *lmin {
