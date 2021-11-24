@@ -104,7 +104,7 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool) *FAResult 
 		reName := regexp.MustCompile(" " + far.Name)
 		if reName.MatchString(far.Product) {
 			protName := strings.Title(strings.ToLower(far.Name)) + "p"
-			far.Product = reName.ReplaceAllString(far.Product, protName)
+			far.Product = reName.ReplaceAllString(far.Product, " " + protName)
 		}
 	}
 
