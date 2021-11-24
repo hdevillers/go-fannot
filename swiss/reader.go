@@ -128,6 +128,47 @@ func (r *Reader) GetData() *[]string {
 	return &r.data
 }
 
+/*
+	LightParse parse only essential elements for
+	subset selection and do not extract the complete
+	data from the entry.
+*/
+func (r *Reader) LightParse() *Entry {
+	if len(r.data) == 0 {
+		panic("No data read. You must call Next() method first.")
+	}
+
+	// Initialize the new entry
+	var entry Entry
+
+	// Split data by line types into a map
+	mdata := make(map[string]string)
+	for _, line := range r.data {
+		key := line[0:2]
+		mdata[key] += line[5:]
+	}
+
+	// Retrieve the length of the protein
+	le := regexp.MustCompile(`(\d+) AA`).FindStringSubmatch(mdata["ID"])
+	if len(le) != 2 {
+		panic(fmt.Sprintf("Failed to retrieve the length of the protein (%s).", mdata["ID"]))
+	}
+	var err error
+	entry.Length, err = strconv.Atoi(le[1])
+	if err != nil {
+		panic(err)
+	}
+
+	// Organisme and phylum
+	entry.Organism = mdata["OS"]
+	entry.Phylum = mdata["OC"]
+
+	// Entry evidence level
+	entry.Evidence = mdata["PE"][0:1]
+
+	return &entry
+}
+
 func (r *Reader) Parse() *Entry {
 	if len(r.data) == 0 {
 		panic("No data read. You must call Next() method first.")
