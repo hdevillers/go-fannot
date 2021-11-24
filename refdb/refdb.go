@@ -30,9 +30,11 @@ type Refdb struct {
 	Nprot     int
 	Equal     bool // Indicate if the DB contain proteins of the query
 	OverWrite bool // Indicate if annotations from the DB can overwrite "similar" annotations
+	Reviewed  bool // Indicate if the DB is reviewed (Uniprot) or not (TrEmbl)
+	GeneName  bool // Indicate if we can transfer gene name in the query feature
 }
 
-func NewRefdb(outdir, id, source, desc string, equal bool, ow bool) *Refdb {
+func NewRefdb(outdir, id, source, desc string, equal bool, ow bool, re bool, gn bool) *Refdb {
 	var rdb Refdb
 
 	// Check if the source exist
@@ -75,6 +77,8 @@ func NewRefdb(outdir, id, source, desc string, equal bool, ow bool) *Refdb {
 	rdb.Desc = desc
 	rdb.Equal = equal
 	rdb.OverWrite = ow
+	rdb.Reviewed = re
+	rdb.GeneName = gn
 
 	return &rdb
 }

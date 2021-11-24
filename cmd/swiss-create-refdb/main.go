@@ -12,6 +12,8 @@ func main() {
 	outdir := flag.String("outdir", ".", "Output directory.")
 	equal := flag.Bool("equal", false, "Indicate that the reference contains genes from the query.")
 	ow := flag.Bool("overwrite", false, "Indicate that annotations from this DB can overwrite annotation from other DB.")
+	unre := flag.Bool("unreviewed", false, "Indicate if annotation are unreviewed (from TrEmbl).")
+	gn := flag.Bool("gene-name", false, "Indicate if gene name can be transfered in query features.")
 	desc := flag.String("desc", "No description", "Database description.")
 	flag.Parse()
 
@@ -23,7 +25,7 @@ func main() {
 	}
 
 	// Create the refdb object
-	rdb := refdb.NewRefdb(*outdir, *name, *input, *desc, *equal, *ow)
+	rdb := refdb.NewRefdb(*outdir, *name, *input, *desc, *equal, *ow, !*unre, *gn)
 
 	// Load the data
 	rdb.LoadSource()
