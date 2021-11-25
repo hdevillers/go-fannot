@@ -25,7 +25,7 @@ const (
 	PRE_SIM_HIGH  string  = "higly similar to"
 	PRE_SIM_NORM  string  = "similar to"
 	REVIEWED_DB   string  = "uniprot"
-	UNREVIEWED_DB string  = "trembl"
+	UNREVIEWED_DB string  = "uniprot"
 )
 
 // DEFINING STRUCTURES
@@ -106,6 +106,11 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool, re bool, g
 	} else {
 		far.Note = fmt.Sprintf("%s %s|%s %s", PRE_SIM_NORM, dbType, far.GeneID, far.Organism)
 	}
+
+	if !re {
+		far.Note += ", unreviewed"
+	}
+
 	if values[2] != "" {
 		far.Note += " " + values[2]
 		far.Locus = values[2]
@@ -124,8 +129,8 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool, re bool, g
 
 	// Add putative to the product if the gene name should not be transfered
 	if !gn {
-		if !regexp.MustCompile(`^putative`).MatchString(far.Note) {
-			far.Note = "putative " + far.Note
+		if !regexp.MustCompile(`^putative`).MatchString(far.Product) {
+			far.Product = "putative " + far.Product
 		}
 	}
 
@@ -139,10 +144,15 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool, re bool, g
 }
 
 func (far *FAResult) PrintFAResult(gid string) {
+	cg := 0
+	if far.CopyGID {
+		cg = 1
+	}
+
 	fmt.Printf(
-		"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%.03f\t%.03f\t%s\t%d\t%t\n",
+		"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%d\t%.03f\t%.03f\t%s\t%d\t%t\n",
 		gid, far.Product, far.Note, far.Organism,
-		far.GeneID, far.Locus, far.Name,
+		far.GeneID, far.Locus, far.Name, cg,
 		strings.Join(far.IpsId, ","), strings.Join(far.IpsAnnot, "; "), far.Status,
 		far.HitSim, far.HitLR, far.RefID, far.HitNum,
 		far.HitOW,
@@ -162,7 +172,7 @@ func getMinLengthRatio(l1, l2 int) float64 {
 
 // Print functional annotation table header
 func PrintFAResultsHeader() {
-	fmt.Println("GeneID\tProduct\tNote\tOrganism\tRefID\tRefLocus\tRefName\tIPSID\tIPSAnnot\tStatus\tSimilarity\tLengthRatio\tDBID\tHitNum\tOverWritten")
+	fmt.Println("GeneID\tProduct\tNote\tOrganism\tRefID\tRefLocus\tRefName\tCopyName\tIPSID\tIPSAnnot\tStatus\tSimilarity\tLengthRatio\tDBID\tHitNum\tOverWritten")
 }
 
 // Functional annotation main structure
