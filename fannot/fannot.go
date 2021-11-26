@@ -107,10 +107,6 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool, re bool, g
 		far.Note = fmt.Sprintf("%s %s|%s %s", PRE_SIM_NORM, dbType, far.GeneID, far.Organism)
 	}
 
-	if !re {
-		far.Note += ", unreviewed"
-	}
-
 	if values[2] != "" {
 		far.Note += " " + values[2]
 		far.Locus = values[2]
@@ -125,6 +121,10 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool, re bool, g
 			protName := strings.Title(strings.ToLower(far.Name)) + "p"
 			far.Product = reName.ReplaceAllString(far.Product, " "+protName)
 		}
+	}
+
+	if !re {
+		far.Note += ", unreviewed"
 	}
 
 	// Add putative to the product if the gene name should not be transfered
