@@ -91,6 +91,7 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool, re bool, g
 
 	// Keep only species name (delete strain data)
 	tmpOrg := strings.Split(values[3], " (")
+	tmpOrg[0] = regexp.MustCompile(`\.$`).ReplaceAllString(tmpOrg[0], "")
 	far.Organism = tmpOrg[0]
 
 	// Db type
