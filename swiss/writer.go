@@ -39,6 +39,7 @@ func NewWriter(file string) *Writer {
 func (w *Writer) Close() {
 	// Flush before closing
 	w.err = w.writer.Flush()
+	w.PanicOnError()
 	w.closer.Close()
 }
 
