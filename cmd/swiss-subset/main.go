@@ -18,6 +18,14 @@ type Subset struct {
 	Lmin  int
 }
 
+type SubsetWriter struct {
+	Writer *swiss.Writer
+}
+
+func NewSubsetWriter(o string) *SubsetWriter {
+	return &SubsetWriter{swiss.NewWriter(o)}
+}
+
 func check(e error) {
 	if e != nil {
 		panic(e)
@@ -25,17 +33,13 @@ func check(e error) {
 }
 
 // Recorder routine
-func recordEntry(ec chan *[]string, re chan int, out string) {
-	// Create a writer
-	sww := swiss.NewWriter(out)
-	sww.PanicOnError()
-	defer sww.Close()
-
+func (sww *SubsetWriter) recordEntry(ec chan *[]string, re chan int) {
 	nrec := 0
 
 	for e := range ec {
-		sww.WriteStrings(e)
-		sww.WriteEntryEnd()
+		sww.Writer.WriteStrings(e)
+		sww.Writer.WriteEntryEnd()
+		sww.Writer.PanicOnError()
 		nrec++
 	}
 
@@ -83,10 +87,12 @@ func (s *Subset) parseFile(ec chan *[]string, th chan int, in string) {
 				continue
 			}
 		}
-		var dt []string
-		dt = *swr.GetData()
 
-		ec <- &dt
+		// Copy the pointer (otherwize it is lost before writing...)
+		var tmp []string
+		tmp = *swr.GetData()
+
+		ec <- &tmp
 	}
 
 	// Throw the number of scanned entries
@@ -135,8 +141,13 @@ func main() {
 	threadChan := make(chan int)
 	recordChan := make(chan int)
 
+	// Initialze output writer
+	sww := NewSubsetWriter(*output)
+	sww.Writer.PanicOnError()
+	defer sww.Writer.Close()
+
 	// Launch the recording routine
-	go recordEntry(entryChan, recordChan, *output)
+	go sww.recordEntry(entryChan, recordChan)
 
 	// Init. a new subset object
 	s := Subset{*ekeep, *eskip, *tkeep, *tskip, *lmin}
