@@ -72,26 +72,29 @@ func (i *Ips) LoadIpsData(f string) error {
 
 		// Only lines with 13 elements contain a IPR ID
 		if len(elem) == 13 {
-			// Check the E-value (or score)
-			eval, err := strconv.ParseFloat(elem[8], 64)
-			if err != nil {
-				return err
-			}
-
-			if eval <= i.Evalue {
-				if geneId != elem[0] {
-					// Create a new entry for the gene
-					geneId = elem[0]
-					i.Data[geneId] = NewIpsEntry(geneId)
-					i.NGenes++
+			// Check if the prediction have a proper IPS ID
+			if elem[11] != "-" {
+				// Check the E-value (or score)
+				eval, err := strconv.ParseFloat(elem[8], 64)
+				if err != nil {
+					return err
 				}
 
-				// Check if the IPR is already stored
-				_, set := i.Data[geneId].KeyValue[elem[11]]
+				if eval <= i.Evalue {
+					if geneId != elem[0] {
+						// Create a new entry for the gene
+						geneId = elem[0]
+						i.Data[geneId] = NewIpsEntry(geneId)
+						i.NGenes++
+					}
 
-				if !set {
-					i.Data[geneId].KeyValue[elem[11]] = CleanUpAnnot(elem[12])
-					i.Data[geneId].Nkeys++
+					// Check if the IPR is already stored
+					_, set := i.Data[geneId].KeyValue[elem[11]]
+
+					if !set {
+						i.Data[geneId].KeyValue[elem[11]] = CleanUpAnnot(elem[12])
+						i.Data[geneId].Nkeys++
+					}
 				}
 			}
 		}
