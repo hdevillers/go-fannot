@@ -202,8 +202,11 @@ func (r *Reader) Parse() *Entry {
 
 	// Get information from CC lines
 	if mdata["CC"] != "" {
+		// Delete the copyright that can be merged with the function
+		tmpCC := strings.Split(mdata["CC"], "---------")
+
 		// Split by "-!- "
-		cc := strings.Split(mdata["CC"], "-!- ")
+		cc := strings.Split(tmpCC[0], "-!- ")
 
 		// Scan each cc type
 	CCVAL:
