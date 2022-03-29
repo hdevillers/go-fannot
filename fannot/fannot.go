@@ -16,16 +16,8 @@ import (
 
 // Initialize default thresholds
 const (
-	N_BEST_HITS   int     = 3
-	MIN_LRA_HIGH  float64 = 0.8
-	MIN_SIM_HIGH  float64 = 80.0
-	MIN_LRA_NORM  float64 = 0.7
-	MIN_SIM_NORM  float64 = 50.0
-	UNKNOWN_FUNC  string  = "hypothetical protein"
-	PRE_SIM_HIGH  string  = "higly similar to"
-	PRE_SIM_NORM  string  = "similar to"
-	REVIEWED_DB   string  = "uniprot"
-	UNREVIEWED_DB string  = "uniprot"
+	REVIEWED_DB   string = "uniprot"
+	UNREVIEWED_DB string = "uniprot"
 )
 
 // DEFINING STRUCTURES
