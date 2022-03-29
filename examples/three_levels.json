@@ -1,0 +1,24 @@
+{
+    "Unk_ann" : "hypothetical protein",
+    "Nbh_chk" : 3,
+    "Rules" : [
+        {
+            "Min_sim" : 80.0,
+            "Min_lra" : 0.8,
+            "Pre_ann" : "highly similar to",
+            "Cpy_gen" : true
+        },
+        {
+            "Min_sim" : 50.0,
+            "Min_lra" : 0.7,
+            "Pre_ann" : "similar to",
+            "Cpy_gen" : false
+        },
+        {
+            "Min_sim" : 30.0,
+            "Min_lra" : 0.6,
+            "Pre_ann" : "weakly similar to",
+            "Cpy_gen" : false
+        }
+    ]
+}
