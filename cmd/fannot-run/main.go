@@ -10,6 +10,7 @@ func main() {
 	query := flag.String("query", "", "Input query fasta file.")
 	refdb := flag.String("refdb", "", "List of reference DB (coma separator).")
 	dirdb := flag.String("dirdb", "", "Sub-directory that contains the reference DBs.")
+	rules := flag.String("rules", "", "JSON file containing similarity levels.")
 	ipsin := flag.String("ips", "", "InterProScan output predictions (TSV format).")
 	threads := flag.Int("threads", 4, "Number of threads.")
 	flag.Parse()
@@ -23,6 +24,11 @@ func main() {
 
 	// Initialize the functional annotation strucutre
 	fa := fannot.NewFannot(*query)
+
+	// Reset rules if a JSON is provided
+	if *rules != "" {
+		fa.FaPar = *fannot.NewParamFromJson(*rules)
+	}
 
 	// Parse the list of reference DB
 	fa.GetDBs(*refdb, *dirdb)

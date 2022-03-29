@@ -114,6 +114,9 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool, re bool, g
 			protName := strings.Title(strings.ToLower(far.Name)) + "p"
 			far.Product = reName.ReplaceAllString(far.Product, " "+protName)
 		}
+	} else {
+		// No gene name hence do not copy
+		far.CopyGID = false
 	}
 
 	if !re {
@@ -170,21 +173,22 @@ func PrintFAResultsHeader() {
 
 // Functional annotation main structure
 type Fannot struct {
-	Queries    []seq.Seq
-	NQueries   int
-	DBs        []refdb.Refdb
-	DBi        int
-	DBEntries  map[string]seq.Seq
-	Finished   []bool
-	Results    []FAResult
-	BlastPar   blast.Param
-	NeedlePar  needle.Param
-	Ips        ips.Ips
-	NBestHits  int
+	Queries   []seq.Seq
+	NQueries  int
+	DBs       []refdb.Refdb
+	DBi       int
+	DBEntries map[string]seq.Seq
+	Finished  []bool
+	Results   []FAResult
+	FaPar     Param
+	BlastPar  blast.Param
+	NeedlePar needle.Param
+	Ips       ips.Ips
+	/*NBestHits  int
 	MinLraHigh float64
 	MinSimHigh float64
 	MinLraNorm float64
-	MinSimNorm float64
+	MinSimNorm float64*/
 }
 
 func NewFannot(i string) *Fannot {
@@ -209,11 +213,12 @@ func NewFannot(i string) *Fannot {
 	}
 
 	// Setup default threshold
-	fa.NBestHits = N_BEST_HITS
+	fa.FaPar = *NewParam()
+	/*fa.NBestHits = N_BEST_HITS
 	fa.MinLraHigh = MIN_LRA_HIGH
 	fa.MinSimHigh = MIN_SIM_HIGH
 	fa.MinLraNorm = MIN_LRA_NORM
-	fa.MinSimNorm = MIN_SIM_NORM
+	fa.MinSimNorm = MIN_SIM_NORM*/
 
 	return &fa
 }
@@ -277,6 +282,9 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 			bestHitLen := 0
 			bestHitStatus := 0
 			bestHitNum := 0
+			bestHitCanOwr := false
+			bestHitCpyGn := true
+
 		HITS:
 			for _, hit := range results.Hits {
 				// For each hit, compute the global alignment and extract the similarity
@@ -301,18 +309,28 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 				}
 
 				chkhit++
-				if chkhit >= fa.NBestHits {
+				if chkhit >= fa.FaPar.Nbh_chk {
 					break HITS
 				}
 			}
 
 			// Validate the best Hit
 			bestHitLenRatio := getMinLengthRatio(bestHitLen, fa.Queries[qi].Length())
-			if bestHitSim >= fa.MinSimHigh && bestHitLenRatio >= fa.MinLraHigh {
+		CHECK:
+			for _, rule := range fa.FaPar.Rules {
+				if bestHitSim >= rule.Min_sim && bestHitLenRatio >= rule.Min_lra {
+					bestHitStatus = rule.Hit_sta
+					bestHitCanOwr = rule.Ovr_wrt
+					bestHitCpyGn = rule.Cpy_gen
+					break CHECK
+				}
+			}
+
+			/*if bestHitSim >= fa.MinSimHigh && bestHitLenRatio >= fa.MinLraHigh {
 				bestHitStatus = 2
 			} else if bestHitSim >= fa.MinSimNorm && bestHitLenRatio >= fa.MinLraNorm {
 				bestHitStatus = 1
-			}
+			}*/
 
 			// Get the annotation if the best hit is good enough
 			hitIsQuery := false
@@ -328,7 +346,11 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 					fa.Results[qi].HitSim = bestHitSim
 					fa.Results[qi].HitLR = bestHitLenRatio
 					fa.Results[qi].HitNum = bestHitNum
-				} else if fa.DBs[fa.DBi].OverWrite {
+					if fa.Results[qi].CopyGID {
+						// Reset gene name copy
+						fa.Results[qi].CopyGID = bestHitCpyGn
+					}
+				} else if fa.DBs[fa.DBi].OverWrite && bestHitCanOwr {
 					// The current DB allows overwrite
 					// An overwrite is possible only if the stored
 					// annotation is "similar" and the new hit is
@@ -340,6 +362,10 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 							fa.Results[qi].HitLR = bestHitLenRatio
 							fa.Results[qi].HitNum = bestHitNum
 							fa.Results[qi].HitOW = true
+							if fa.Results[qi].CopyGID {
+								// Reset gene name copy
+								fa.Results[qi].CopyGID = bestHitCpyGn
+							}
 						}
 					}
 				}
