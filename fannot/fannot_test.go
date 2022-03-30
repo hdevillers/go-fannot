@@ -1,4 +1,4 @@
-package swiss
+package fannot
 
 import (
 	"os/exec"

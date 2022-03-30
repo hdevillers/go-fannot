@@ -14,7 +14,8 @@ build:
 	go build -o bin/refdb-info ./cmd/refdb-info/main.go
 
 test:
-	go test -v swiss/swiss_test.go
+	go test -v fannot/fannot_test.go
+	go test -v fannot/param.go fannot/param_test.go
 
 install:
 	cp bin/swiss-count $(INSTALL_DIR)/swiss-count
