@@ -14,7 +14,7 @@ import (
 	"github.com/hdevillers/go-seq/utils"
 )
 
-// Initialize default thresholds
+// Initialize default variable
 const (
 	REVIEWED_DB   string = "uniprot"
 	UNREVIEWED_DB string = "uniprot"
@@ -63,7 +63,7 @@ func NewFAResult() *FAResult {
 	}
 }
 
-func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool, re bool, gn bool) *FAResult {
+func ParseHitDesc(hd string, hid string, rid string, hs int, pre string, eq bool, re bool, gn bool) *FAResult {
 	var far FAResult
 	values := strings.Split(hd, "::")
 
@@ -94,10 +94,8 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, eq bool, re bool, g
 
 	if eq {
 		far.Note = fmt.Sprintf("%s|%s %s", dbType, far.GeneID, far.Organism)
-	} else if hs == 2 {
-		far.Note = fmt.Sprintf("%s %s|%s %s", PRE_SIM_HIGH, dbType, far.GeneID, far.Organism)
 	} else {
-		far.Note = fmt.Sprintf("%s %s|%s %s", PRE_SIM_NORM, dbType, far.GeneID, far.Organism)
+		far.Note = fmt.Sprintf("%s %s|%s %s", pre, dbType, far.GeneID, far.Organism)
 	}
 
 	if values[2] != "" {
@@ -184,11 +182,6 @@ type Fannot struct {
 	BlastPar  blast.Param
 	NeedlePar needle.Param
 	Ips       ips.Ips
-	/*NBestHits  int
-	MinLraHigh float64
-	MinSimHigh float64
-	MinLraNorm float64
-	MinSimNorm float64*/
 }
 
 func NewFannot(i string) *Fannot {
@@ -214,11 +207,6 @@ func NewFannot(i string) *Fannot {
 
 	// Setup default threshold
 	fa.FaPar = *NewParam()
-	/*fa.NBestHits = N_BEST_HITS
-	fa.MinLraHigh = MIN_LRA_HIGH
-	fa.MinSimHigh = MIN_SIM_HIGH
-	fa.MinLraNorm = MIN_LRA_NORM
-	fa.MinSimNorm = MIN_SIM_NORM*/
 
 	return &fa
 }
@@ -284,6 +272,7 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 			bestHitNum := 0
 			bestHitCanOwr := false
 			bestHitCpyGn := true
+			bestHitPre := ""
 
 		HITS:
 			for _, hit := range results.Hits {
@@ -322,15 +311,10 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 					bestHitStatus = rule.Hit_sta
 					bestHitCanOwr = rule.Ovr_wrt
 					bestHitCpyGn = rule.Cpy_gen
+					bestHitPre = rule.Pre_ann
 					break CHECK
 				}
 			}
-
-			/*if bestHitSim >= fa.MinSimHigh && bestHitLenRatio >= fa.MinLraHigh {
-				bestHitStatus = 2
-			} else if bestHitSim >= fa.MinSimNorm && bestHitLenRatio >= fa.MinLraNorm {
-				bestHitStatus = 1
-			}*/
 
 			// Get the annotation if the best hit is good enough
 			hitIsQuery := false
@@ -342,7 +326,7 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 				if !fa.Finished[qi] {
 					// Set an annotation to this protein
 					fa.Finished[qi] = true
-					fa.Results[qi] = *ParseHitDesc(bestHitDesc, bestHitId, fa.DBs[fa.DBi].Id, bestHitStatus, hitIsQuery, fa.DBs[fa.DBi].Reviewed, fa.DBs[fa.DBi].GeneName)
+					fa.Results[qi] = *ParseHitDesc(bestHitDesc, bestHitId, fa.DBs[fa.DBi].Id, bestHitStatus, bestHitPre, hitIsQuery, fa.DBs[fa.DBi].Reviewed, fa.DBs[fa.DBi].GeneName)
 					fa.Results[qi].HitSim = bestHitSim
 					fa.Results[qi].HitLR = bestHitLenRatio
 					fa.Results[qi].HitNum = bestHitNum
@@ -357,7 +341,7 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 					// better.
 					if fa.Results[qi].Status == 1 {
 						if bestHitSim > fa.Results[qi].HitSim && bestHitLenRatio > fa.Results[qi].HitLR {
-							fa.Results[qi] = *ParseHitDesc(bestHitDesc, bestHitId, fa.DBs[fa.DBi].Id, bestHitStatus, hitIsQuery, fa.DBs[fa.DBi].Reviewed, fa.DBs[fa.DBi].GeneName)
+							fa.Results[qi] = *ParseHitDesc(bestHitDesc, bestHitId, fa.DBs[fa.DBi].Id, bestHitStatus, bestHitPre, hitIsQuery, fa.DBs[fa.DBi].Reviewed, fa.DBs[fa.DBi].GeneName)
 							fa.Results[qi].HitSim = bestHitSim
 							fa.Results[qi].HitLR = bestHitLenRatio
 							fa.Results[qi].HitNum = bestHitNum
