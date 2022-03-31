@@ -3,6 +3,7 @@ package fannot
 import (
 	"fmt"
 	"regexp"
+	"sort"
 	"strings"
 	"unicode"
 
@@ -375,9 +376,16 @@ func (fa *Fannot) AddIpsAnnot() {
 		// Get ips entries for this gene (if exists)
 		ips, ok := fa.Ips.Data[gid]
 		if ok {
-			for ipr, ann := range ips.KeyValue {
-				fa.Results[qi].IpsId = append(fa.Results[qi].IpsId, ipr)
-				fa.Results[qi].IpsAnnot = append(fa.Results[qi].IpsAnnot, ann)
+			// Sort IPS keys in order to avoid random IPS order
+			ipsids := make([]string, len(ips.KeyValue))
+			for ipsid := range ips.KeyValue {
+				ipsids = append(ipsids, ipsid)
+			}
+			sort.Strings(ipsids)
+
+			for _, ipsid := range ipsids {
+				fa.Results[qi].IpsId = append(fa.Results[qi].IpsId, ipsid)
+				fa.Results[qi].IpsAnnot = append(fa.Results[qi].IpsAnnot, ips.KeyValue[ipsid])
 			}
 
 			// If no homology found, then add IpsAnnot to /note qualifier
