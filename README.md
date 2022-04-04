@@ -2,7 +2,7 @@
 
 ## About
 
-`go-FAnnoT` is functional annotion transfer tool based on protein homology. Our motivations to develop this tools were towfold:
+`go-FAnnoT` is functional annotion transfer tool based on protein homology. Our motivations to develop this tools were manyfold:
 
 * __Defining a precise strategy to build reference datasets__. Indeed, most of time, transfer tools consider the annotation of one closely related species annotation as reference, copying possible errors. While it is necessary to adapt reference proteins to the organisms, a more robust strategy is required to ensure the quality of functional annotations.
 * __Evaluating homology from global alignment and not from a local alignment__. Most of the existing tools identify matches on a basis of BLAST search. Unfortunatly, measuring homology on BLAST alignment is not sufficient and sequences should be realigned with a global alignment tool.
@@ -28,13 +28,13 @@ Concerning the `TrEMBL` data, it is recommanded to download only a subset of the
 
 ### External tools
 
-To run go-FAnnoT, it is necessary to have NCBI-BLAST+ tool suite and NEEDLE (from EMBOSS tool suite) in the system `PATH`. To do so, there are several solutions:
+To run `go-FAnnoT`, it is necessary to have __NCBI-BLAST+__ tool suite and __NEEDLE__ (from __EMBOSS__ tool suite) in the system `PATH`. To do so, there are several solutions:
 
 * Use a __conda__ environment with these two tools.
-* Install these tools. Binaries are available at the following urls:
+* (Or) Install these tools. Binaries are available at the following urls:
     * [NCBI-BLAST+](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/)
     * [EMBOSS](ftp://emboss.open-bio.org/pub/EMBOSS/emboss-latest.tar.gz)
-* (For __linux__ only) Most of the recent distributions have these tools available directly in there repositories: 
+* (Or, for __linux__ only) Most of the recent distributions have these tools available directly in there repositories: 
 
 ```
 # Example with Ubuntu
