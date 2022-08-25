@@ -75,7 +75,7 @@ func ParseHitDesc(hd string, hid string, rid string, hs int, pre string, eq bool
 	far.CopyGID = gn
 	far.Reviewed = re
 
-	// Clean up Product
+	// Lower the first character of the product if it is not a gene name
 	if regexp.MustCompile(`^[A-Z][a-z ]`).MatchString(far.Product) {
 		tmp := []rune(far.Product)
 		tmp[0] = unicode.ToLower(tmp[0])
