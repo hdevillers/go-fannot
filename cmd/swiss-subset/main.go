@@ -10,95 +10,6 @@ import (
 	"github.com/hdevillers/go-fannot/swiss"
 )
 
-type Subset struct {
-	Ekeep string
-	Eskip string
-	Tkeep string
-	Tskip string
-	Lmin  int
-}
-
-type SubsetWriter struct {
-	Writer *swiss.Writer
-}
-
-func NewSubsetWriter(o string) *SubsetWriter {
-	return &SubsetWriter{swiss.NewWriter(o)}
-}
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-// Recorder routine
-func (sww *SubsetWriter) recordEntry(ec chan *[]string, re chan int) {
-	nrec := 0
-
-	for e := range ec {
-		sww.Writer.WriteStrings(e)
-		sww.Writer.WriteEntryEnd()
-		sww.Writer.PanicOnError()
-		nrec++
-	}
-
-	// Throw the number of recorded entries
-	re <- nrec
-}
-
-func (s *Subset) parseFile(ec chan *[]string, th chan int, in string) {
-	// Create a reader
-	swr := swiss.NewReader(in)
-	swr.PanicOnError()
-	defer swr.Close()
-
-	ntot := 0
-
-	for swr.Next() {
-		// Parse the entry
-		e := swr.LightParse()
-		ntot++
-
-		if e.Length < s.Lmin {
-			continue
-		}
-
-		if s.Eskip != "" {
-			if e.TestEvidence(s.Eskip) {
-				continue
-			}
-		}
-
-		if s.Tskip != "" {
-			if e.TestTaxonomy(s.Tskip) {
-				continue
-			}
-		}
-
-		if s.Ekeep != "" {
-			if !e.TestEvidence(s.Ekeep) {
-				continue
-			}
-		}
-
-		if s.Tkeep != "" {
-			if !e.TestTaxonomy(s.Tkeep) {
-				continue
-			}
-		}
-
-		// Copy the pointer (otherwize it is lost before writing...)
-		var tmp []string
-		tmp = *swr.GetData()
-
-		ec <- &tmp
-	}
-
-	// Throw the number of scanned entries
-	th <- ntot
-}
-
 func main() {
 	input := flag.String("i", "", "Input SwissProt data file.")
 	output := flag.String("o", "", "Output data file.")
@@ -106,6 +17,8 @@ func main() {
 	eskip := flag.String("E", "", "Evidence skip instruction (regex).")
 	tkeep := flag.String("t", "", "Taxonomy keep instruction (regex).")
 	tskip := flag.String("T", "", "Taxonomy skip instruction (regex).")
+	dkeep := flag.String("d", "", "Description/function keep instruction (regex).")
+	dskip := flag.String("D", "", "Description/function skip instruction (regex).")
 	lmin := flag.Int("l", 30, "Minimal protein length (aa).")
 	flag.Parse()
 
@@ -117,7 +30,7 @@ func main() {
 		panic("You must provide an output file name.")
 	}
 
-	if *ekeep == "" && *eskip == "" && *tkeep == "" && *tskip == "" {
+	if *ekeep == "" && *eskip == "" && *tkeep == "" && *tskip == "" && *dkeep == "" && *dskip == "" {
 		panic("You must provide at least one keep/skip instruction.")
 	}
 
@@ -142,19 +55,28 @@ func main() {
 	recordChan := make(chan int)
 
 	// Initialze output writer
-	sww := NewSubsetWriter(*output)
+	sww := swiss.NewSubsetWriter(*output)
 	sww.Writer.PanicOnError()
 	defer sww.Writer.Close()
 
 	// Launch the recording routine
-	go sww.recordEntry(entryChan, recordChan)
+	go sww.RecordEntry(entryChan, recordChan)
 
 	// Init. a new subset object
-	s := Subset{*ekeep, *eskip, *tkeep, *tskip, *lmin}
+	s := swiss.Subset{
+		Ekeep: *ekeep, Eskip: *eskip,
+		Tkeep: *tkeep, Tskip: *tskip,
+		Dkeep: *dkeep, Dskip: *dskip,
+		Lmin: *lmin}
 
 	// Launch reading routine(s)
 	for _, file := range files {
-		go s.parseFile(entryChan, threadChan, file)
+		// Parsing optimization if reading function is not necessary
+		if *dkeep == "" && *dskip == "" {
+			go s.LightParseFile(entryChan, threadChan, file)
+		} else {
+			go s.ParseFile(entryChan, threadChan, file)
+		}
 	}
 
 	// Wait for reading threads

@@ -63,6 +63,27 @@ func (e *Entry) TestTaxonomy(re string) bool {
 	return false
 }
 
+func (e *Entry) TestDescription(re string) bool {
+	retest, err := regexp.Compile(re)
+	if err != nil {
+		panic("[TestDescription]: Cannot compile regex.")
+	}
+
+	// First test the short Description string
+	if retest.MatchString(e.Desc) {
+		return true
+	}
+
+	// Then test the long Description (if available)
+	if e.Function != "" {
+		if retest.MatchString(e.Function) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (e *Entry) Test(tk, ts, ek, es string) bool {
 	// Skip direct
 	return false
