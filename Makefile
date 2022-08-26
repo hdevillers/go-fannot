@@ -14,7 +14,7 @@ build:
 	go build -o bin/refdb-info ./cmd/refdb-info/main.go
 
 test:
-	go test -v fannot/fannot_test.go
+	go test -v fannot/param.go fannot/fannot.go fannot/fannot_test.go
 	go test -v fannot/param.go fannot/param_test.go
 
 install:
