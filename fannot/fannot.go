@@ -308,7 +308,8 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 			bestHitLenRatio := getMinLengthRatio(bestHitLen, fa.Queries[qi].Length())
 		CHECK:
 			for _, rule := range fa.FaPar.Rules {
-				if bestHitSim >= rule.Min_sim && bestHitLenRatio >= rule.Min_lra {
+				//if bestHitSim >= rule.Min_sim && bestHitLenRatio >= rule.Min_lra {
+				if rule.Test(bestHitSim, bestHitLenRatio) {
 					bestHitStatus = rule.Hit_sta
 					bestHitCanOwr = rule.Ovr_wrt
 					bestHitCpyGn = rule.Cpy_gen
