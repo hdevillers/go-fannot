@@ -15,6 +15,7 @@ build:
 
 test:
 	go test -v fannot/rule.go fannot/rule_test.go
+	go test -v fannot/besthit.go fannot/besthit_test.go
 	go test -v fannot/rule.go fannot/param.go fannot/param_test.go
 	go test -v fannot/rule.go fannot/param.go fannot/fannot.go fannot/fannot_test.go
 	
