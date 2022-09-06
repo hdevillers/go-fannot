@@ -20,6 +20,12 @@ func NewDescription(dn string, s seq.Seq) *Description {
 	var d Description
 	d.Data = make(map[string]string)
 
+	// Initialize fields
+	f := NewFields()
+	for k := range f.Labels {
+		d.Data[k] = DEFAULT_DATA
+	}
+
 	// Fill db name
 	d.Data["DbName"] = dn
 
@@ -31,10 +37,6 @@ func NewDescription(dn string, s seq.Seq) *Description {
 	// refdb description (5 splits)
 	if len(values) == 1 {
 		d.Data["ShortDesc"] = s.Desc
-		d.Data["GeneName"] = DEFAULT_DATA
-		d.Data["ProteinName"] = DEFAULT_DATA
-		d.Data["LocusTag"] = DEFAULT_DATA
-		d.Data["Species"] = DEFAULT_DATA
 		d.Data["LongDesc"] = s.Desc
 	} else if len(values) == 5 {
 		// First value: the short desctription
@@ -44,16 +46,11 @@ func NewDescription(dn string, s seq.Seq) *Description {
 		if values[1] != "" {
 			d.Data["GeneName"] = values[1]
 			d.Data["ProteinName"] = strings.Title(strings.ToLower(values[1])) + "p"
-		} else {
-			d.Data["GeneName"] = DEFAULT_DATA
-			d.Data["ProteinName"] = DEFAULT_DATA
 		}
 
 		// Thrid value: the locus tag
 		if values[2] != "" {
 			d.Data["LocusTag"] = values[2]
-		} else {
-			d.Data["LocusTag"] = DEFAULT_DATA
 		}
 
 		// Fourth value: the organism name
@@ -62,8 +59,6 @@ func NewDescription(dn string, s seq.Seq) *Description {
 			tmpOrg := strings.Split(values[3], " (")
 			tmpOrg[0] = regexp.MustCompile(`\.$`).ReplaceAllString(tmpOrg[0], "")
 			d.Data["Species"] = tmpOrg[0]
-		} else {
-			d.Data["Species"] = DEFAULT_DATA
 		}
 
 		// Fifth value: the long description
