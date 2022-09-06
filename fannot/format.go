@@ -29,6 +29,9 @@ func NewFormat(input string) *Format {
 		return &f
 	}
 
+	// Init. a Fields object to control entries
+	fld := NewFields()
+
 	// Look for possible 'transformer'
 	tmp := strings.Split(input, "::")
 	// No transformer by default
@@ -64,9 +67,13 @@ func NewFormat(input string) *Format {
 			// Identify fields
 			f.Fields[i] = make([]string, len(dt))
 			for j, fi := range dt {
-				su := regexp.MustCompile("{" + fi[1] + "}")
-				sub = su.ReplaceAllString(sub, "#"+strconv.Itoa(j))
-				f.Fields[i][j] = fi[1]
+				if fld.Exists(fi[1]) {
+					su := regexp.MustCompile("{" + fi[1] + "}")
+					sub = su.ReplaceAllString(sub, "#"+strconv.Itoa(j))
+					f.Fields[i][j] = fi[1]
+				} else {
+					panic(fmt.Sprintf(`Unsupported field: %s.`, fi[1]))
+				}
 			}
 			// Save the edited template
 			f.Template[i] = sub
