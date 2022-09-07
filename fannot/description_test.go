@@ -120,7 +120,7 @@ func TestDescriptionFromSimpleEntry(t *testing.T) {
 func TestDescriptionCorruptedEntry(t *testing.T) {
 	defer func() {
 		if r := recover(); r == nil {
-			t.Fatal(`Description parsing should have failed, but it did not.`)
+			t.Fatal(`Description parsing failed to detect bad input.`)
 		}
 	}()
 

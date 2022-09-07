@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 const (
@@ -38,7 +39,7 @@ func NewFormat(input string) *Format {
 	f.TransGnPn = false
 	f.TransToLwr = false
 	for i := 1; i < len(tmp); i++ {
-		if tmp[i] == "GnGp" {
+		if tmp[i] == "GnPn" {
 			f.TransGnPn = true
 		} else if tmp[i] == "ToLwr" {
 			f.TransToLwr = true
@@ -81,4 +82,53 @@ func NewFormat(input string) *Format {
 	}
 
 	return &f
+}
+
+func (f *Format) Compile(d *Description) string {
+	var out = ""
+	if f.Empty {
+		return out
+	}
+
+SUBTEMP:
+	for i, sub := range f.Template {
+		// Check for fields to replace
+		if len(f.Fields[i]) == 0 {
+			// No field, just copy the current sub template
+			out = out + sub
+		} else {
+			// Check if required fields are set (if not skip the sub)
+			for j, field := range f.Fields[i] {
+				if !d.IsSetField(field) {
+					continue SUBTEMP
+				}
+				// Replace the value in the sub template
+				tmp := strings.Split(sub, "#"+strconv.Itoa(j))
+				sub = strings.Join(tmp, d.Data[field])
+			}
+			out = out + sub
+		}
+		// Check for transformers
+		if f.TransToLwr {
+			// Lower the first Character of the sentence except if it is an
+			// acronym
+			if regexp.MustCompile(`^[A-Z][a-z ]`).MatchString(out) {
+				tmp := []rune(out)
+				tmp[0] = unicode.ToLower(tmp[0])
+				out = string(tmp)
+			}
+		}
+
+		if f.TransGnPn {
+			// Replace the gene name by protein name (if set)
+			if d.IsSetField("GeneName") {
+				re := regexp.MustCompile(d.Data["GeneName"])
+				// We suppose that if there is a gene name, the protein name
+				// has been automaticaly deduced
+				out = re.ReplaceAllString(out, d.Data["ProteinName"])
+			}
+		}
+
+	}
+	return out
 }
