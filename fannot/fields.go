@@ -12,6 +12,7 @@ func NewFields() *Fields {
 		"DbName", "DbId", "ShortDesc",
 		"LongDesc", "GeneName", "ProteinName",
 		"LocusTag", "Species", "Prefix",
+		"Putative", "Unreviewed",
 	}
 
 	// Init. Labels attribute
