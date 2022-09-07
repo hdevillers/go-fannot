@@ -9,21 +9,25 @@ import (
 )
 
 const (
-	DEFAULT_DATA string = "Null"
+	DEFAULT_DESCRIPTION string = "Null"
 )
 
 type Description struct {
-	Data map[string]string
+	Data       map[string]string
+	Putative   bool
+	Unreviewed bool
 }
 
 func NewDescription(dn string, s seq.Seq) *Description {
 	var d Description
 	d.Data = make(map[string]string)
+	d.Putative = false
+	d.Unreviewed = false
 
 	// Initialize fields
 	f := NewFields()
 	for k := range f.Labels {
-		d.Data[k] = DEFAULT_DATA
+		d.Data[k] = DEFAULT_DESCRIPTION
 	}
 
 	// Fill db name
@@ -84,7 +88,7 @@ func (d *Description) HasField(f string) bool {
 func (d *Description) IsSetField(f string) bool {
 	val, test := d.Data[f]
 	if test {
-		if val == DEFAULT_DATA {
+		if val == DEFAULT_DESCRIPTION {
 			return false
 		} else {
 			return true

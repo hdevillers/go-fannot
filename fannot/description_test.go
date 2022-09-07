@@ -76,10 +76,10 @@ func TestDescriptionFromPartialRefdbEntry(t *testing.T) {
 	d := NewDescription("UNIPROT", s)
 
 	// In that case, GeneName and LocusTag must have the default value
-	if d.Data["GeneName"] != DEFAULT_DATA {
+	if d.Data["GeneName"] != DEFAULT_DESCRIPTION {
 		t.Fatalf("The field GeneName should not be set, but found %s.", d.Data["GeneName"])
 	}
-	if d.Data["LocusTag"] != DEFAULT_DATA {
+	if d.Data["LocusTag"] != DEFAULT_DESCRIPTION {
 		t.Fatalf("The field LocusTag should not be set, but found %s.", d.Data["LocusTag"])
 	}
 
@@ -101,10 +101,10 @@ func TestDescriptionFromSimpleEntry(t *testing.T) {
 	d := NewDescription("UNIPROT", s)
 
 	// In that case, GeneName and LocusTag must have the default value
-	if d.Data["GeneName"] != DEFAULT_DATA {
+	if d.Data["GeneName"] != DEFAULT_DESCRIPTION {
 		t.Fatalf("The field GeneName should not be set, but found %s.", d.Data["GeneName"])
 	}
-	if d.Data["LocusTag"] != DEFAULT_DATA {
+	if d.Data["LocusTag"] != DEFAULT_DESCRIPTION {
 		t.Fatalf("The field LocusTag should not be set, but found %s.", d.Data["LocusTag"])
 	}
 
