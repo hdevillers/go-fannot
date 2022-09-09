@@ -8,20 +8,8 @@ import (
 
 // Default thresholds
 const (
-	N_BEST_HITS  int     = 3
-	MIN_LRA_HIGH float64 = 0.8
-	MIN_SIM_HIGH float64 = 80.0
-	MIN_LRA_NORM float64 = 0.7
-	MIN_SIM_NORM float64 = 50.0
-	UNKNOWN_FUNC string  = "hypothetical protein"
-	PRE_SIM_HIGH string  = "highly similar to"
-	PRE_SIM_NORM string  = "similar to"
-	CPY_GEN_HIGH bool    = true
-	CPY_GEN_NORM bool    = false
-	OVR_WRT_HIGH bool    = true
-	OVR_WRT_NORM bool    = false
-	HIT_STA_HIGH int     = 2
-	HIT_STA_NORM int     = 1
+	N_BEST_HITS  int    = 3
+	UNKNOWN_FUNC string = "hypothetical protein"
 )
 
 // Global parameter object
@@ -40,11 +28,9 @@ func NewParam() *Param {
 	p.Unk_ann = UNKNOWN_FUNC
 
 	// Prepare rules
-	rule_high := Rule{MIN_SIM_HIGH, MIN_LRA_HIGH, PRE_SIM_HIGH, CPY_GEN_HIGH, OVR_WRT_HIGH, HIT_STA_HIGH}
-	rule_norm := Rule{MIN_SIM_NORM, MIN_LRA_NORM, PRE_SIM_NORM, CPY_GEN_NORM, OVR_WRT_NORM, HIT_STA_NORM}
 	p.Rules = make([]Rule, 2)
-	p.Rules[0] = rule_high
-	p.Rules[1] = rule_norm
+	p.Rules[0] = *NewRuleHighlySimilar()
+	p.Rules[1] = *NewRuleSimilar()
 
 	// Return
 	return &p
