@@ -9,13 +9,13 @@ func TestParamDefault(t *testing.T) {
 	p := NewParam()
 
 	// Check the default best hit number
-	if p.Nbh_chk != N_BEST_HITS {
-		t.Errorf("Default number of hits should be %d, found %d", N_BEST_HITS, p.Nbh_chk)
+	if p.NbHitCheck != NB_HIT_CHECK {
+		t.Errorf("Default number of hits should be %d, found %d", NB_HIT_CHECK, p.NbHitCheck)
 	}
 
 	// Check the default annotation for unknown function
-	if p.Unk_ann != UNKNOWN_FUNC {
-		t.Errorf("Default unknown function annotation should be %s, found %s", UNKNOWN_FUNC, p.Unk_ann)
+	if p.DefaultNote != DFT_NOTE {
+		t.Errorf("Default unknown function annotation should be %s, found %s", DFT_NOTE, p.DefaultNote)
 	}
 
 	// Check the number of rules (=2)

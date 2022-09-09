@@ -8,24 +8,50 @@ import (
 
 // Default thresholds
 const (
-	N_BEST_HITS  int    = 3
+	NB_HIT_CHECK int    = 3
 	UNKNOWN_FUNC string = "hypothetical protein"
+	DFT_NOTE     string = "hypothetical protein"
+	DFT_PRODUCT  string = "hypothetical protein"
+	DFT_GENENAME string = ""
+	DFT_FUNCTION string = ""
+	TPL_NOTE     string = "{Prefix}||{BdName}|{BdId} ||{Species} ||{LocusTag} ||{GeneName} ||{LongDesc}"
+	TPL_PRODUCT  string = "{ShortDesc}::ToLwr::GnPn"
+	TPL_GENENAME string = "{GeneName}"
+	TPL_FUNCTION string = ""
 )
 
 // Global parameter object
 type Param struct {
-	Unk_ann string
-	Nbh_chk int
-	Rules   []Rule
+	DefaultNote      string
+	DefaultProduct   string
+	DefaultGeneName  string
+	DefaultFunction  string
+	TemplateNote     string
+	TemplateProduct  string
+	TemplateGeneName string
+	TemplateFunction string
+	NbHitCheck       int
+	Rules            []Rule
 }
 
 // Create a new parameter object with default values
 func NewParam() *Param {
 	var p Param
 
-	// Main values
-	p.Nbh_chk = N_BEST_HITS
-	p.Unk_ann = UNKNOWN_FUNC
+	// Init. default annotations
+	p.DefaultNote = DFT_NOTE
+	p.DefaultProduct = DFT_PRODUCT
+	p.DefaultGeneName = DFT_GENENAME
+	p.DefaultFunction = DFT_FUNCTION
+
+	// Init. templates
+	p.TemplateNote = TPL_NOTE
+	p.TemplateProduct = TPL_PRODUCT
+	p.TemplateGeneName = TPL_GENENAME
+	p.TemplateFunction = TPL_FUNCTION
+
+	// Nb of best hit to keep/check
+	p.NbHitCheck = NB_HIT_CHECK
 
 	// Prepare rules
 	p.Rules = make([]Rule, 2)
