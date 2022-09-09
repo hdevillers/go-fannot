@@ -24,7 +24,7 @@ func NewBestHit(q seq.Seq, np needle.Param) *BestHit {
 	bh.Similarity = 0.0
 	bh.LengthRatio = 0.0
 	bh.NeedleParam = np
-	bh.IdRule = 0
+	bh.IdRule = -1
 
 	return &bh
 }

@@ -14,7 +14,7 @@ const (
 	DFT_PRODUCT  string = "hypothetical protein"
 	DFT_GENENAME string = ""
 	DFT_FUNCTION string = ""
-	TPL_NOTE     string = "{Prefix}||{BdName}|{BdId} ||{Species} ||{LocusTag} ||{GeneName} ||{LongDesc}"
+	TPL_NOTE     string = "{Prefix}||{DbName}|{DbId} ||{Species} ||{LocusTag} ||{GeneName} ||{LongDesc}"
 	TPL_PRODUCT  string = "{ShortDesc}::ToLwr::GnPn"
 	TPL_GENENAME string = "{GeneName}"
 	TPL_FUNCTION string = ""

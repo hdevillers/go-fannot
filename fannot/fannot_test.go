@@ -65,6 +65,12 @@ func TestFunctional01(t *testing.T) {
 		t.Fatalf(`Bad reference DB id, expected S288c_lipase, obtained %s.`, fa.DBs[fa.DBi].Id)
 	}
 
+	// Setup format (with default)
+	fa.NoteFormat = *NewFormat(TPL_NOTE)
+	fa.ProductFormat = *NewFormat(TPL_PRODUCT)
+	fa.GeneNameFormat = *NewFormat(TPL_GENENAME)
+	fa.FunctionFormat = *NewFormat(TPL_FUNCTION)
+
 	// fannot has been developped to use channels and multi-threading
 	// Initiate channels
 	queryChan := make(chan int)
@@ -107,7 +113,7 @@ func TestFunctional01(t *testing.T) {
 	}
 
 	// The first sequence has a similarity of 100%
-	if fa.Results[0].HitSim != 100.0 {
-		t.Fatalf(`First sequence should have a hit similarity of 100, obtained: %.02f`, fa.Results[0].HitSim)
+	if fa.Results[0].Similarity != 100.0 {
+		t.Fatalf(`First sequence should have a hit similarity of 100, obtained: %.02f`, fa.Results[0].Similarity)
 	}
 }

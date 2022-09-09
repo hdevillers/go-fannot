@@ -20,7 +20,7 @@ test:
 	go test -v fannot/fields.go fannot/description.go fannot/description_test.go
 	go test -v fannot/fields.go fannot/description.go fannot/format.go fannot/format_test.go
 	go test -v fannot/rule.go fannot/param.go fannot/param_test.go
-	go test -v fannot/rule.go fannot/param.go fannot/fannot.go fannot/fannot_test.go
+	go test -v fannot/rule.go fannot/param.go fannot/fannot.go fannot/fields.go fannot/description.go fannot/format.go fannot/result.go fannot/besthit.go fannot/fannot_test.go
 	
 
 install:

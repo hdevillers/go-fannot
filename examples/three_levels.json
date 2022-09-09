@@ -1,6 +1,13 @@
 {
-    "Unk_ann" : "hypothetical protein",
-    "Nbh_chk" : 3,
+    "DefaultNote": "hypothetical protein",
+    "DefaultProduct": "hypothetical protein",
+    "DefaultGeneName": "",
+    "DefaultFunction": "",
+    "TemplateNote": "{Prefix}||{BdName}|{BdId} ||{Species} ||{LocusTag} ||{GeneName} ||{LongDesc}",
+    "TemplateProduct": "{ShortDesc}::ToLwr::GnPn",
+    "TemplateGeneName": "{GeneName}",
+    "TemplateFunction": "",
+    "NbHitCheck": 3,
     "Rules" : [
         {
             "Min_sim" : 80.0,

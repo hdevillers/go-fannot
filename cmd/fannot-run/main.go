@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 
 	"github.com/hdevillers/go-fannot/fannot"
 )
@@ -27,7 +28,7 @@ func main() {
 
 	// Reset rules if a JSON is provided
 	if *rules != "" {
-		fa.FaPar = *fannot.NewParamFromJson(*rules)
+		fa.Param = *fannot.NewParamFromJson(*rules)
 	}
 
 	// Parse the list of reference DB
@@ -40,6 +41,12 @@ func main() {
 			panic(err)
 		}
 	}
+
+	// Init. annotation templates/format
+	fa.NoteFormat = *fannot.NewFormat(fa.Param.TemplateNote)
+	fa.ProductFormat = *fannot.NewFormat(fa.Param.TemplateProduct)
+	fa.GeneNameFormat = *fannot.NewFormat(fa.Param.TemplateGeneName)
+	fa.FunctionFormat = *fannot.NewFormat(fa.Param.TemplateFunction)
 
 REFDB:
 	for fa.NextDB() {
@@ -83,8 +90,9 @@ REFDB:
 	}
 
 	// Printout the results
-	fannot.PrintFAResultsHeader()
+	fmt.Print(fannot.Header())
+	//fannot.PrintFAResultsHeader()
 	for i := 0; i < fa.NQueries; i++ {
-		fa.Results[i].PrintFAResult(fa.Queries[i].Id)
+		fmt.Print(fa.Results[i].ToString(fa.Queries[i].Id))
 	}
 }

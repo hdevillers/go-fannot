@@ -1,6 +1,8 @@
 package fannot
 
 import (
+	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/hdevillers/go-blast"
@@ -12,17 +14,21 @@ import (
 )
 
 type Fannot struct {
-	Queries   []seq.Seq
-	NQueries  int
-	DBs       []refdb.Refdb
-	DBi       int
-	DBEntries map[string]seq.Seq
-	Finished  []bool
-	Results   []Result
-	Param     Param
-	BlastPar  blast.Param
-	NeedlePar needle.Param
-	Ips       ips.Ips
+	Queries        []seq.Seq
+	NQueries       int
+	DBs            []refdb.Refdb
+	DBi            int
+	DBEntries      map[string]seq.Seq
+	Finished       []bool
+	Results        []Result
+	Param          Param
+	BlastPar       blast.Param
+	NeedlePar      needle.Param
+	Ips            ips.Ips
+	NoteFormat     Format
+	ProductFormat  Format
+	GeneNameFormat Format
+	FunctionFormat Format
 }
 
 func NewFannot(i string) *Fannot {
@@ -41,12 +47,6 @@ func NewFannot(i string) *Fannot {
 	// Init. results and Finished variables
 	fa.Finished = make([]bool, fa.NQueries)
 	fa.Results = make([]Result, fa.NQueries)
-
-	/* INIT. Results later */
-	//for i := 0; i < fa.NQueries; i++ {
-	// Set default result (when no match is found)
-	//	fa.Results[i] = *NewResult()
-	//}
 
 	// Setup default threshold
 	fa.Param = *NewParam()
@@ -111,5 +111,132 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 		}
 
 		// Init. the Result object for the current query
-		fa.Results[i] = Result{}
+		fa.Results[qi] = Result{
+			Note:     fa.Param.DefaultNote,
+			Product:  fa.Param.DefaultProduct,
+			GeneName: fa.Param.DefaultGeneName,
+			Function: fa.Param.DefaultFunction,
+		}
+
+		// Init. a BestHit object
+		bestHit := NewBestHit(fa.Queries[qi], fa.NeedlePar)
+
+		// Parse blast result
+		results := blt.Rst.Iterations[0]
+		if len(results.Hits) > 0 {
+
+			// Scan each hit
+		HITS:
+			for _, hit := range results.Hits {
+				// Retrieved the hit seq.Seq object
+				hitId := hit.GetHitId()
+				hitSeq, test := fa.DBEntries[hitId]
+				if !test {
+					panic(fmt.Sprintf("Failed to find the hit %s in the reference DB (%s).", hitId, fa.DBs[fa.DBi].Id))
+				}
+
+				// Check if it is the best hit
+				bestHit.CheckHit(hitSeq)
+
+				if bestHit.NumHits >= fa.Param.NbHitCheck {
+					break HITS
+				}
+			}
+
+			// Check if the best hit satify a rule
+		CHECK:
+			for ri, rule := range fa.Param.Rules {
+				//if bestHitSim >= rule.Min_sim && bestHitLenRatio >= rule.Min_lra {
+				if rule.Test(bestHit.Similarity, bestHit.LengthRatio) {
+					bestHit.IdRule = ri
+					break CHECK
+				}
+			}
+
+			// If found a satified rule, extract annotation
+			if bestHit.IdRule != -1 {
+				// Extract and copy annotation?
+				copy := false
+				ow := false
+				if !fa.Finished[qi] {
+					fa.Finished[qi] = true
+					copy = true
+				} else if fa.DBs[fa.DBi].OverWrite && fa.Param.Rules[bestHit.IdRule].Ovr_wrt {
+					// The current DB allows overwrite
+					// An overwrite is possible only if the stored
+					// annotation is "similar" and the new hit is
+					// better.
+					if fa.Results[qi].Status > fa.Param.Rules[bestHit.IdRule].Hit_sta {
+						copy = true
+						ow = true
+					}
+				}
+
+				// If annotation copy is required
+				if copy {
+					// Prepare description
+					desc := NewDescription("uniprot", bestHit.HitSeq)
+
+					// (re)set description according to DB and rule
+					desc.Unreviewed = !fa.DBs[fa.DBi].Reviewed
+					desc.SetField("Prefix", fa.Param.Rules[bestHit.IdRule].Pre_ann)
+					if fa.DBs[fa.DBi].Equal && bestHit.Similarity == 100.0 {
+						desc.SetField("Prefix", "")
+					}
+
+					// Complete Result
+					fa.Results[qi].Note = fa.NoteFormat.Compile(desc)
+					fa.Results[qi].Product = fa.ProductFormat.Compile(desc)
+					fa.Results[qi].GeneName = fa.GeneNameFormat.Compile(desc)
+					fa.Results[qi].Function = fa.FunctionFormat.Compile(desc)
+					fa.Results[qi].Similarity = bestHit.Similarity
+					fa.Results[qi].LengthRatio = bestHit.LengthRatio
+					fa.Results[qi].HitOvrWrt = ow
+					fa.Results[qi].HitNum = bestHit.NumHits
+					fa.Results[qi].HitId = bestHit.HitSeq.Id
+					fa.Results[qi].HitLocus = desc.GetField("LocusTag")
+					fa.Results[qi].HitSpecies = desc.GetField("Species")
+					fa.Results[qi].Status = fa.Param.Rules[bestHit.IdRule].Hit_sta
+					fa.Results[qi].DbId = fa.DBs[fa.DBi].Id
+				}
+
+			}
+		}
+		// Else do nothing
+
+		// Remove the query
+		blt.ResetQuery()
+	}
+
+	// Terminate the thread
+	threadChan <- 1
+}
+
+func (fa *Fannot) AddIpsAnnot() {
+	// Check each results
+	for qi := 0; qi < fa.NQueries; qi++ {
+		// Get gene ID
+		gid := fa.Queries[qi].Id
+
+		// Get ips entries for this gene (if exists)
+		ips, ok := fa.Ips.Data[gid]
+		if ok {
+			// Sort IPS keys in order to avoid random IPS order
+			ipsids := make([]string, len(ips.KeyValue))
+			for ipsid := range ips.KeyValue {
+				ipsids = append(ipsids, ipsid)
+			}
+			sort.Strings(ipsids)
+
+			for _, ipsid := range ipsids {
+				fa.Results[qi].IpsId = append(fa.Results[qi].IpsId, ipsid)
+				fa.Results[qi].IpsAnnot = append(fa.Results[qi].IpsAnnot, ips.KeyValue[ipsid])
+			}
+
+			// If no homology found, then add IpsAnnot to /note qualifier
+			if fa.Results[qi].Status == 0 {
+				fa.Results[qi].Note += ", InterProScan predictions: " + strings.Join(fa.Results[qi].IpsAnnot, "; ")
+			}
+		}
+	}
 }

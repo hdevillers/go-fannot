@@ -96,3 +96,20 @@ func (d *Description) IsSetField(f string) bool {
 	}
 	return false
 }
+
+func (d *Description) GetField(f string) string {
+	val, test := d.Data[f]
+	if test {
+		return val
+	}
+	panic(fmt.Sprintf(`[GetField]: Unsupported field: %s.`, f))
+}
+
+func (d *Description) SetField(f, v string) {
+	_, test := d.Data[f]
+	if test {
+		d.Data[f] = v
+	} else {
+		panic(fmt.Sprintf(`[SetField]: Unsupported field: %s.`, f))
+	}
+}
