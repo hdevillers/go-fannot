@@ -1,7 +1,9 @@
 package fannot
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 
@@ -238,5 +240,31 @@ func (fa *Fannot) AddIpsAnnot() {
 				fa.Results[qi].Note += ", InterProScan predictions: " + strings.Join(fa.Results[qi].IpsAnnot, "; ")
 			}
 		}
+	}
+}
+
+// Write out
+func (fa *Fannot) WriteOut(o string) {
+	if o == "" {
+		// No output path provided, print to stdout
+		fmt.Print(Header())
+		for i := 0; i < fa.NQueries; i++ {
+			fmt.Print(fa.Results[i].ToString(fa.Queries[i].Id))
+		}
+	} else {
+		// Save to the output path provided
+		f, err := os.Create(o)
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
+
+		fw := bufio.NewWriter(f)
+
+		fw.WriteString(Header())
+		for i := 0; i < fa.NQueries; i++ {
+			fw.WriteString(fa.Results[i].ToString(fa.Queries[i].Id))
+		}
+		fw.Flush()
 	}
 }

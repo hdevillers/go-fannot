@@ -2,13 +2,13 @@ package main
 
 import (
 	"flag"
-	"fmt"
 
 	"github.com/hdevillers/go-fannot/fannot"
 )
 
 func main() {
 	query := flag.String("query", "", "Input query fasta file.")
+	output := flag.String("output", "", "Output path (tsv).")
 	refdb := flag.String("refdb", "", "List of reference DB (coma separator).")
 	dirdb := flag.String("dirdb", "", "Sub-directory that contains the reference DBs.")
 	rules := flag.String("rules", "", "JSON file containing similarity levels.")
@@ -90,9 +90,5 @@ REFDB:
 	}
 
 	// Printout the results
-	fmt.Print(fannot.Header())
-	//fannot.PrintFAResultsHeader()
-	for i := 0; i < fa.NQueries; i++ {
-		fmt.Print(fa.Results[i].ToString(fa.Queries[i].Id))
-	}
+	fa.WriteOut(*output)
 }
