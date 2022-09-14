@@ -11,6 +11,15 @@ func TestCreateRefdb(t *testing.T) {
 	outdir := "../examples/refdb/"
 	desc := "Lipase proteins from Saccharomyces cerevisiae S288c."
 
+	// Delete possible data from a previous duild
+	_, err := os.Stat(outdir + name)
+	if err == nil {
+		err = os.RemoveAll(outdir + name)
+		if err != nil {
+			t.Fatal("Failed to remove data from previsous build.")
+		}
+	}
+
 	// Init. Refdb object
 	rdb := NewRefdb(outdir, name, input, desc, true, false, true, true)
 
@@ -21,7 +30,7 @@ func TestCreateRefdb(t *testing.T) {
 	rdb.WriteJson()
 
 	// Check if files have been created
-	_, err := os.Stat("../examples/refdb/S288c_lipase/config.json")
+	_, err = os.Stat("../examples/refdb/S288c_lipase/config.json")
 	if err != nil {
 		t.Fatal("The Refdb config file (json) does not exist.")
 	}
