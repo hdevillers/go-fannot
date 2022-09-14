@@ -14,6 +14,7 @@ build:
 	go build -o bin/refdb-info ./cmd/refdb-info/main.go
 
 test:
+	go test -v tools/tools_test.go
 	go test -v fannot/rule.go fannot/rule_test.go
 	go test -v fannot/besthit.go fannot/besthit_test.go
 	go test -v fannot/fields.go fannot/fields_test.go
