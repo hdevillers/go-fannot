@@ -8,6 +8,7 @@
     "TemplateGeneName": "{GeneName}",
     "TemplateFunction": "",
     "NbHitCheck": 3,
+    "MaxStatusOW": 1,
     "Rules" : [
         {
             "Min_sim" : 80.0,

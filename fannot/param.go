@@ -14,6 +14,7 @@ const (
 	DFT_PRODUCT  string = "hypothetical protein"
 	DFT_GENENAME string = ""
 	DFT_FUNCTION string = ""
+	DFT_MAXSTSOW int    = 1
 	TPL_NOTE     string = "{Prefix}||{DbName}|{DbId} ||{Species} ||{LocusTag} ||{GeneName} ||{LongDesc}"
 	TPL_PRODUCT  string = "{ShortDesc}::ToLwr::GnPn"
 	TPL_GENENAME string = "{GeneName}"
@@ -32,6 +33,7 @@ type Param struct {
 	TemplateFunction string
 	NbHitCheck       int
 	Rules            []Rule
+	MaxStatusOW      int
 }
 
 // Create a new parameter object with default values
@@ -43,6 +45,7 @@ func NewParam() *Param {
 	p.DefaultProduct = DFT_PRODUCT
 	p.DefaultGeneName = DFT_GENENAME
 	p.DefaultFunction = DFT_FUNCTION
+	p.MaxStatusOW = DFT_MAXSTSOW
 
 	// Init. templates
 	p.TemplateNote = TPL_NOTE

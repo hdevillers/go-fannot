@@ -65,7 +65,7 @@ REFDB:
 			if !fa.Finished[i] {
 				nq++
 				queryChan <- i
-			} else if fa.DBs[fa.DBi].OverWrite && fa.Results[i].Status == 1 {
+			} else if fa.DBs[fa.DBi].OverWrite && fa.Results[i].Status <= fa.Param.MaxStatusOW {
 				// Try to overwrite the annotation
 				nq++
 				queryChan <- i
