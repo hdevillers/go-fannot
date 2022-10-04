@@ -1,10 +1,19 @@
 #!/usr/bin/env python
 
-import sys
+from email.mime import base
+from Bio import SeqIO
 import getopt
-from os.path import exists
 import glob
+from os.path import exists
+from os.path import basename
+import sys
 
+def fatal(msg):
+    print(msg, file=sys.stderr)
+    sys.exit(2)
+
+def warn(msg):
+    print(msg, file=sys.stderr)
 
 def main(argv):
     # Default values
@@ -85,7 +94,33 @@ def main(argv):
     if exists(in_seq):
         seq_files.append(in_seq)
     else:
-        glob.glob()
+        for fn in glob.glob(in_seq):
+            seq_files.append(fn)
+    if len(seq_files) == 0:
+        fatal("Failed to find input sequence file(s).")
+    
+    # Prepare output files
+    seq_out = []
+    ask_owt = False
+    for fn in seq_files:
+        bn = basename(fn)
+        so = out_dir + '/' + bn
+        if exists(so):
+            ask_owt = True
+            warn("The output sequence file (" + so + ") already exists.")
+        seq_out.append(so)
+    if ask_owt:
+        asw = input("Overwrite existing output file(s)? [No/yes]: ")
+        if asw == "" or asw.lower() == "no" or asw.lower == "n":
+            fatal("Please, check output arguments.")
+        elif asw.lower() == "yes" or asw.lower == "y":
+            pass
+        else:
+            fatal(asw + " is not an appropriate answer.")
+
+    # Scan each sequence file(s)
+    
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
