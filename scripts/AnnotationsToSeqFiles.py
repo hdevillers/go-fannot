@@ -22,10 +22,16 @@ def main(argv):
     in_format = 'embl'
     out_dir = './'
     out_format = 'embl'
+    feature_type = 'CDS'
+    id_qualifier = 'locus_tag'
+    keep_prev_annot = False
+    wanted_qualifiers = 'note,product,gene'
+    allowed_qualifiers = ['note', 'product', 'gene', 'function']
+
 
     # Parse arguments
     try:
-        opts, args = getopt.getopt(argv, "ha:s:f:o:F:", ["help", "annotations=", "seq-files=", "in-format=", "output=", "out-format="])
+        opts, args = getopt.getopt(argv, "ha:s:f:o:F:t:ki:q:", ["help", "annotations=", "seq-files=", "in-format=", "output=", "out-format=", "feature-type", "keep-previous-annotation", "id-qualifier", "wanted-qualifiers"])
     except getopt.GetopError:
         print('An error occured while parsing input arguments.', file=sys.stderr)
         sys.exit(2)
@@ -43,6 +49,14 @@ def main(argv):
             out_dir = arg
         elif opt in ('-F', '--out-format'):
             out_format = arg
+        elif opt in ('-t', '--feature-type'):
+            feature_type = arg
+        elif opt in ('-k', '--keep-previous-annotation'):
+            keep_prev_annot = True
+        elif opt in ('-i', '--id-qualifier'):
+            id_qualifier = arg
+        elif opt in ('-q', '--wanted-qualifiers'):
+            wanted_qualifiers = arg
         else:
             print('Unknonwn argument: '+opt+'.', file=sys.stderr)
             sys.exit(2)
@@ -56,6 +70,12 @@ def main(argv):
         print('Input format ('+in_format+') not supported', file=sys.stderr)
     if out_format not in ('embl', 'bg', 'genbank'):
         print('Ouput format ('+out_format+') not supported', file=sys.stderr)
+    if wanted_qualifiers == '':
+        fatal("You must provide at least one qualifier type to copy.")
+    wq = wanted_qualifiers.split(',')
+    for q in wq:
+        if q not in allowed_qualifiers:
+            fatal("The queried qualifier type ("+q+") is not supported.")
 
     # Load and store annotation data
     try:
@@ -78,12 +98,12 @@ def main(argv):
                 sys.exit(2)
             # Extract data
             ann_data[dt[0]] = {
-                'Product': dt[1],
-                'Note': dt[2],
-                'Function': dt[3],
-                'GeneName': dt[7],
-                'Status': dt[10],
-                'Copied': False
+                'product': dt[1],
+                'note': dt[2],
+                'function': dt[3],
+                'gene': dt[7],
+                'status': dt[10],
+                'copied': False
             }
             # Read next line
             line = f.readline()
@@ -119,8 +139,38 @@ def main(argv):
             fatal(asw + " is not an appropriate answer.")
 
     # Scan each sequence file(s)
-    
-
+    for i in range(len(seq_files)):
+        path_in = seq_files[i]
+        path_out = seq_out[i]
+        with open(path_in) as hdl_in:
+            edited_records = []
+            for record in SeqIO.parse(hdl_in, in_format):
+                for feature in record.features:
+                    # Check feature type
+                    if feature.type == feature_type:
+                        # Get feature name
+                        if id_qualifier in feature.qualifiers:
+                            # NOTE: test only the first value (should not be multiple)
+                            if feature.qualifiers[id_qualifier][0] in ann_data:
+                                id = feature.qualifiers[id_qualifier][0]
+                                ann_data[id]['copied'] = True
+                                if keep_prev_annot:
+                                    for q in wq:
+                                        if ann_data[id][q] != "":
+                                            if q in feature.qualifiers:
+                                                feature.qualifiers[q].append(ann_data[id][q])        
+                                            else:
+                                                feature.qualifiers[q] = [ann_data[id][q]]
+                                else:
+                                    for q in wq:
+                                        if ann_data[id][q] != "":
+                                            feature.qualifiers[q] = [ann_data[id][q]]
+                # Save the record
+                edited_records.append(record)
+            # Write the records in the output file
+            with open(path_out, 'w') as hdl_out:
+                for record in edited_records:
+                    SeqIO.write(record, hdl_out, out_format)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
