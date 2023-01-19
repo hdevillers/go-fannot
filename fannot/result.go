@@ -28,6 +28,7 @@ func Header() string {
 	return "GeneID\tProduct\tNote\tFunction\tOrganism\tRefID\tRefLocus\tRefName\tIPSID\tIPSAnnot\tStatus\tSimilarity\tLengthRatio\tDBID\tHitNum\tOverWritten\n"
 }
 
+// Convert a Result object into string
 func (r *Result) ToString(gid string) string {
 	return fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%.03f\t%.03f\t%s\t%d\t%t\n",
 		gid, r.Product, r.Note, r.Function, r.HitSpecies,

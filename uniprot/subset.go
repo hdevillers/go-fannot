@@ -1,4 +1,4 @@
-package swiss
+package uniprot
 
 type Subset struct {
 	Ekeep string

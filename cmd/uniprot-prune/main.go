@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/hdevillers/go-fannot/swiss"
+	"github.com/hdevillers/go-fannot/uniprot"
 )
 
 func check(e error) {
@@ -15,26 +15,26 @@ func check(e error) {
 }
 
 func main() {
-	input := flag.String("i", "", "Input SwissProt data file.")
-	output := flag.String("o", "", "Output pruned SwissPort data file.")
+	input := flag.String("i", "", "Input UniProt data file.")
+	output := flag.String("o", "", "Output pruned UniPort data file.")
 	pmeth := flag.Bool("m", false, "Prune proteins that do not start by a Methionine.")
 	pdesc := flag.Bool("d", false, "Prune proteins without description.")
 	pfunc := flag.Bool("f", false, "Prune proteins without function information.")
 	flag.Parse()
 
 	if *input == "" {
-		panic("You must provide a SwissProt data file.")
+		panic("You must provide a UniProt data file.")
 	}
 
 	if *output == "" {
 		panic("You must provide an output file name.")
 	}
 
-	swr := swiss.NewReader(*input)
+	swr := uniprot.NewReader(*input)
 	swr.PanicOnError()
 	defer swr.Close()
 
-	sww := swiss.NewWriter(*output)
+	sww := uniprot.NewWriter(*output)
 	sww.PanicOnError()
 	defer sww.Close()
 

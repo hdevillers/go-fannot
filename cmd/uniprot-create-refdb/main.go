@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	input := flag.String("input", "", "Input swissProt data file.")
+	input := flag.String("input", "", "Input UniProt data file.")
 	name := flag.String("id", "", "Name of the reference database.")
 	outdir := flag.String("outdir", ".", "Output directory.")
 	equal := flag.Bool("equal", false, "Indicate that the reference contains genes from the query.")
@@ -18,7 +18,7 @@ func main() {
 	flag.Parse()
 
 	if *input == "" {
-		panic("You must provide a SwissProt data file.")
+		panic("You must provide a UniProt data file.")
 	}
 	if *name == "" {
 		panic("You must provide a name for the new reference database.")

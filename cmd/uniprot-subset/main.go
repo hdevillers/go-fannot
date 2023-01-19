@@ -7,11 +7,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hdevillers/go-fannot/swiss"
+	"github.com/hdevillers/go-fannot/uniprot"
 )
 
 func main() {
-	input := flag.String("i", "", "Input SwissProt data file.")
+	input := flag.String("i", "", "Input UniProt data file.")
 	output := flag.String("o", "", "Output data file.")
 	ekeep := flag.String("e", "", "Evident keep instruction (regex).")
 	eskip := flag.String("E", "", "Evidence skip instruction (regex).")
@@ -23,7 +23,7 @@ func main() {
 	flag.Parse()
 
 	if *input == "" {
-		panic("You must provide a SwissProt data file.")
+		panic("You must provide a UniProt data file.")
 	}
 
 	if *output == "" {
@@ -55,7 +55,7 @@ func main() {
 	recordChan := make(chan int)
 
 	// Initialze output writer
-	sww := swiss.NewSubsetWriter(*output)
+	sww := uniprot.NewSubsetWriter(*output)
 	sww.Writer.PanicOnError()
 	defer sww.Writer.Close()
 
@@ -63,7 +63,7 @@ func main() {
 	go sww.RecordEntry(entryChan, recordChan)
 
 	// Init. a new subset object
-	s := swiss.Subset{
+	s := uniprot.Subset{
 		Ekeep: *ekeep, Eskip: *eskip,
 		Tkeep: *tkeep, Tskip: *tskip,
 		Dkeep: *dkeep, Dskip: *dskip,

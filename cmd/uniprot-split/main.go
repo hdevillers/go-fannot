@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/hdevillers/go-fannot/swiss"
+	"github.com/hdevillers/go-fannot/uniprot"
 )
 
 func check(e error) {
@@ -14,14 +14,14 @@ func check(e error) {
 }
 
 func main() {
-	input := flag.String("i", "", "Input SwissProt data file.")
+	input := flag.String("i", "", "Input UniProt data file.")
 	output := flag.String("o", "", "Output file basename.")
 	nsplit := flag.Int("n", 10, "Number of sub-data files wanted.")
 	compress := flag.Bool("c", false, "Compress output files.")
 	flag.Parse()
 
 	if *input == "" {
-		panic("You must provide a SwissProt data file.")
+		panic("You must provide a UniProt data file.")
 	}
 
 	if *output == "" {
@@ -32,18 +32,18 @@ func main() {
 		panic("The number of file division must be greater than 1.")
 	}
 
-	swr := swiss.NewReader(*input)
+	swr := uniprot.NewReader(*input)
 	swr.PanicOnError()
 	defer swr.Close()
 
-	writers := make([]*swiss.Writer, *nsplit)
+	writers := make([]*uniprot.Writer, *nsplit)
 	fileExt := ".dat"
 	if *compress {
 		fileExt += ".gz"
 	}
 
 	for i := 0; i < *nsplit; i++ {
-		writers[i] = swiss.NewWriter(*output + fmt.Sprintf("%03d", i) + fileExt)
+		writers[i] = uniprot.NewWriter(*output + fmt.Sprintf("%03d", i) + fileExt)
 		writers[i].PanicOnError()
 		defer writers[i].Close()
 	}

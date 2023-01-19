@@ -1,4 +1,4 @@
-package swiss
+package uniprot
 
 import (
 	"bufio"
@@ -129,9 +129,9 @@ func (r *Reader) GetData() *[]string {
 }
 
 /*
-	LightParse parse only essential elements for
-	subset selection and do not extract the complete
-	data from the entry.
+LightParse parse only essential elements for
+subset selection and do not extract the complete
+data from the entry.
 */
 func (r *Reader) LightParse() *Entry {
 	if len(r.data) == 0 {

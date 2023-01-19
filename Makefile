@@ -5,11 +5,11 @@ ifdef prefix
 endif
 
 build:
-	go build -o bin/swiss-count ./cmd/swiss-count/main.go
-	go build -o bin/swiss-subset ./cmd/swiss-subset/main.go
-	go build -o bin/swiss-create-refdb ./cmd/swiss-create-refdb/main.go
-	go build -o bin/swiss-prune ./cmd/swiss-prune/main.go
-	go build -o bin/swiss-split ./cmd/swiss-split/main.go
+	go build -o bin/uniprot-count ./cmd/uniprot-count/main.go
+	go build -o bin/uniprot-subset ./cmd/uniprot-subset/main.go
+	go build -o bin/uniprot-create-refdb ./cmd/uniprot-create-refdb/main.go
+	go build -o bin/uniprot-prune ./cmd/uniprot-prune/main.go
+	go build -o bin/uniprot-split ./cmd/uniprot-split/main.go
 	go build -o bin/fannot-run ./cmd/fannot-run/main.go
 	go build -o bin/refdb-info ./cmd/refdb-info/main.go
 
@@ -26,19 +26,19 @@ test:
 	
 
 install:
-	cp bin/swiss-count $(INSTALL_DIR)/swiss-count
-	cp bin/swiss-subset $(INSTALL_DIR)/swiss-subset
-	cp bin/swiss-create-refdb $(INSTALL_DIR)/swiss-create-refdb
-	cp bin/swiss-prune $(INSTALL_DIR)/swiss-prune
-	cp bin/swiss-split $(INSTALL_DIR)/swiss-split
+	cp bin/uniprot-count $(INSTALL_DIR)/uniprot-count
+	cp bin/uniprot-subset $(INSTALL_DIR)/uniprot-subset
+	cp bin/uniprot-create-refdb $(INSTALL_DIR)/uniprot-create-refdb
+	cp bin/uniprot-prune $(INSTALL_DIR)/uniprot-prune
+	cp bin/uniprot-split $(INSTALL_DIR)/uniprot-split
 	cp bin/fannot-run $(INSTALL_DIR)/fannot-run
 	cp bin/refdb-info $(INSTALL_DIR)/refdb-info
 
 uninstall:
-	rm -f $(INSTALL_DIR)/swiss-count
-	rm -f $(INSTALL_DIR)/swiss-subset
-	rm -f $(INSTALL_DIR)/swiss-create-refdb
-	rm -f $(INSTALL_DIR)/swiss-prune
-	rm -f $(INSTALL_DIR)/swiss-split
+	rm -f $(INSTALL_DIR)/uniprot-count
+	rm -f $(INSTALL_DIR)/uniprot-subset
+	rm -f $(INSTALL_DIR)/uniprot-create-refdb
+	rm -f $(INSTALL_DIR)/uniprot-prune
+	rm -f $(INSTALL_DIR)/uniprot-split
 	rm -f $(INSTALL_DIR)/fannot-run
 	rm -f $(INSTALL_DIR)/refdb-info

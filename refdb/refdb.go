@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/hdevillers/go-fannot/swiss"
+	"github.com/hdevillers/go-fannot/uniprot"
 	"github.com/hdevillers/go-seq/seq"
 	"github.com/hdevillers/go-seq/seqio"
 )
@@ -84,8 +84,8 @@ func NewRefdb(outdir, id, source, desc string, equal bool, ow bool, re bool, gn 
 }
 
 func (r *Refdb) LoadSource() {
-	// Init. the swissprot reader
-	swr := swiss.NewReader(r.Source)
+	// Init. the uniprot reader
+	swr := uniprot.NewReader(r.Source)
 	swr.PanicOnError()
 	defer swr.Close()
 

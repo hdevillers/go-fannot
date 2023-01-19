@@ -6,7 +6,7 @@ import (
 )
 
 func TestCreateRefdb(t *testing.T) {
-	input := "../examples/swiss/S288c_lipase.dat.gz"
+	input := "../examples/uniprot/S288c_lipase.dat.gz"
 	name := "S288c_lipase"
 	outdir := "../examples/refdb/"
 	desc := "Lipase proteins from Saccharomyces cerevisiae S288c."

@@ -1,4 +1,4 @@
-package swiss
+package uniprot
 
 import (
 	"fmt"
