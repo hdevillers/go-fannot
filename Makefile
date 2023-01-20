@@ -10,6 +10,7 @@ build:
 	go build -o bin/uniprot-create-refdb ./cmd/uniprot-create-refdb/main.go
 	go build -o bin/uniprot-prune ./cmd/uniprot-prune/main.go
 	go build -o bin/uniprot-split ./cmd/uniprot-split/main.go
+	go build -o bin/uniprot-download ./cmd/uniprot-download/main.go
 	go build -o bin/fannot-run ./cmd/fannot-run/main.go
 	go build -o bin/refdb-info ./cmd/refdb-info/main.go
 
@@ -31,6 +32,7 @@ install:
 	cp bin/uniprot-create-refdb $(INSTALL_DIR)/uniprot-create-refdb
 	cp bin/uniprot-prune $(INSTALL_DIR)/uniprot-prune
 	cp bin/uniprot-split $(INSTALL_DIR)/uniprot-split
+	cp bin/uniprot-download $(INSTALL_DIR)/uniprot-download
 	cp bin/fannot-run $(INSTALL_DIR)/fannot-run
 	cp bin/refdb-info $(INSTALL_DIR)/refdb-info
 
@@ -40,5 +42,6 @@ uninstall:
 	rm -f $(INSTALL_DIR)/uniprot-create-refdb
 	rm -f $(INSTALL_DIR)/uniprot-prune
 	rm -f $(INSTALL_DIR)/uniprot-split
+	rm -f $(INSTALL_DIR)/uniprot-download
 	rm -f $(INSTALL_DIR)/fannot-run
 	rm -f $(INSTALL_DIR)/refdb-info
