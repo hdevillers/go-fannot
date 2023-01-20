@@ -1,11 +1,8 @@
 package main
 
 import (
-	"crypto/md5"
 	"flag"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 
 	"github.com/hdevillers/go-fannot/uniprot"
@@ -95,52 +92,15 @@ func main() {
 	fmt.Println("Finding the proper URL...")
 	url, sum := metalink.GetUrl(*db, *div, *mir)
 
-	// Replace ftp by https
-
 	// Destination file
 	dest := fmt.Sprintf("%suniprot_%s_%s.dat.gz", odir, *db, *div)
 
 	// Check if the file already exists
-	if _, err := os.Stat(dest); os.IsExist(err) {
+	if _, err := os.Stat(dest); !os.IsNotExist(err) {
 		fmt.Printf("The destination file (%s) already exists. Delete it or change output directory.\n", dest)
 		return
 	}
 
-	// Create it
-	out, err := os.Create(dest)
-	if err != nil {
-		panic(err)
-	}
-	defer out.Close()
-
-	// Download the data
-	fmt.Println("Downloading the required file...")
-	resp, err := http.Get(url)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	// Check status code
-	if resp.StatusCode != http.StatusOK {
-		panic(fmt.Sprintf("The request returned a bad status: %s\n", resp.Status))
-	}
-
-	// Check MD5
-	fmt.Println("Check sum (MD5) the downloaded file...")
-	hash := md5.New()
-	io.Copy(hash, resp.Body)
-	// Obtained sum
-	osum := hash.Sum(nil)
-
-	if string(osum) != sum {
-		panic(fmt.Sprintf("Check sum failed,\nexpected: %s,\n obtained: %s", sum, string(osum)))
-	}
-
-	// Write out the file
-	fmt.Println("Writing out the file...")
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		panic(err)
-	}
+	// Launch FTP download
+	uniprot.FtpDownload(url, sum, dest)
 }

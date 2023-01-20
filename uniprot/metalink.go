@@ -1,11 +1,19 @@
 package uniprot
 
 import (
+	"bufio"
+	"crypto/md5"
 	"encoding/xml"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"regexp"
+	"strings"
+	"time"
+
+	"github.com/jlaffaye/ftp"
 )
 
 // Metalink path
@@ -138,4 +146,81 @@ FILES:
 	}
 
 	return link, md5
+}
+
+// FTP download
+func FtpDownload(url, esum, dest string) {
+	// Prepare the url
+	url = strings.Replace(url, "ftp://", "", 1)
+	path := strings.SplitN(url, "/", 2)
+
+	// Init. FTP connection
+	fmt.Println("Connecting to UniProt FTP...")
+	cnn, err := ftp.Dial(fmt.Sprintf("%s:21", path[0]), ftp.DialWithTimeout(10*time.Second))
+	if err != nil {
+		panic(err)
+	}
+
+	// Anonymous identification
+	err = cnn.Login("anonymous", "anonymous")
+	if err != nil {
+		panic(err)
+	}
+
+	// Get the file
+	fmt.Println("Downloading the file...")
+	resp, err := cnn.Retr(path[1])
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Close()
+
+	// CloseFTP connection
+	err = cnn.Quit()
+	if err != nil {
+		panic(err)
+	}
+
+	// Create destination file
+	out, err := os.Create(dest)
+	if err != nil {
+		panic(err)
+	}
+	//defer out.Close()
+
+	// Create an output buffer
+	bufo := bufio.NewWriter(out)
+
+	// Complete download and write out the file
+	_, err = io.Copy(bufo, resp)
+	//_, err = bufo.Write(resp)
+	if err != nil {
+		panic(err)
+	}
+
+	err = bufo.Flush()
+	if err != nil {
+		panic(err)
+	}
+	out.Close()
+
+	// Create a byte reader
+	in, err := os.Open(dest)
+	if err != nil {
+		panic(err)
+	}
+	defer in.Close()
+
+	// Check MD5
+	fmt.Printf("Calculating check sum (expecting: %s) of the downloaded file...\n", esum)
+	hash := md5.New()
+	io.Copy(hash, in)
+
+	// Obtained sum
+	osum := fmt.Sprintf("%x", hash.Sum(nil))
+	if osum != esum {
+		panic(fmt.Sprintf("Check sum failed,\nexpected: %s,\n obtained: %s\n", esum, osum))
+	} else {
+		fmt.Printf("Check sum (%s) is OK.\n", osum)
+	}
 }
