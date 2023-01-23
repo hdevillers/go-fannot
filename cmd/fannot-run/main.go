@@ -3,40 +3,97 @@ package main
 import (
 	"flag"
 
+	"github.com/hdevillers/go-fannot/custom"
 	"github.com/hdevillers/go-fannot/fannot"
 )
 
+// Initialize argument variables
+var input string
+var output string
+var refdb string
+var dirdb string
+var rules string
+var ipsin string
+var threads int
+
+// Init function that manages input arguments
+func init() {
+	// Define default values and usages
+	const (
+		toolName       = "fannot-run"
+		toolDesc       = "Run the functional annotation pipeline"
+		inputDefault   = ""
+		inputUsage     = "Input query file (fasta)"
+		outputDefault  = ""
+		outputUsage    = "Output file path (tsv)"
+		refdbDefault   = ""
+		refdbUsage     = "List of reference database ids (coma separator)"
+		dirdbDefault   = ""
+		dirdbUsage     = "Directory containing the reference databases"
+		rulesDefault   = ""
+		rulesUsage     = "JSON file containing similarity levels"
+		ipsDefault     = ""
+		ipsUsage       = "InterProScan output predictions (TSV format)"
+		threadsDefault = 4
+		threadsUsage   = "Number of threads"
+	)
+
+	// Init. flags
+	flag.StringVar(&input, "input", inputDefault, inputUsage)
+	flag.StringVar(&input, "i", inputDefault, inputUsage)
+	flag.StringVar(&output, "output", outputDefault, outputUsage)
+	flag.StringVar(&output, "o", outputDefault, outputUsage)
+	flag.StringVar(&refdb, "refdb-id", refdbDefault, refdbUsage)
+	flag.StringVar(&refdb, "r", refdbDefault, refdbUsage)
+	flag.StringVar(&dirdb, "refdb-dir", dirdbDefault, dirdbUsage)
+	flag.StringVar(&dirdb, "d", dirdbDefault, dirdbUsage)
+	flag.StringVar(&rules, "rules", rulesDefault, rulesUsage)
+	flag.StringVar(&ipsin, "ips", ipsDefault, ipsUsage)
+	flag.IntVar(&threads, "threads", threadsDefault, threadsUsage)
+	flag.IntVar(&threads, "t", threadsDefault, threadsUsage)
+
+	// Shorthand associations
+	shand := map[string]string{
+		"input":     "i",
+		"output":    "o",
+		"refdb-id":  "r",
+		"refdb-dir": "d",
+		"threads":   "t",
+	}
+
+	// Usage print order
+	order := []string{"input", "output", "refdb-id", "refdb-dir", "rules", "ips", "threads"}
+
+	// Custom usage display
+	flag.Usage = func() {
+		custom.Usage(*flag.CommandLine, toolName, toolDesc, &order, &shand)
+	}
+}
+
 func main() {
-	query := flag.String("query", "", "Input query fasta file.")
-	output := flag.String("output", "", "Output path (tsv).")
-	refdb := flag.String("refdb", "", "List of reference DB (coma separator).")
-	dirdb := flag.String("dirdb", "", "Sub-directory that contains the reference DBs.")
-	rules := flag.String("rules", "", "JSON file containing similarity levels.")
-	ipsin := flag.String("ips", "", "InterProScan output predictions (TSV format).")
-	threads := flag.Int("threads", 4, "Number of threads.")
 	flag.Parse()
 
-	if *query == "" {
+	if input == "" {
 		panic("You must provide an input query file.")
 	}
-	if *refdb == "" {
+	if refdb == "" {
 		panic("You must provide at least one reference DB.")
 	}
 
 	// Initialize the functional annotation strucutre
-	fa := fannot.NewFannot(*query)
+	fa := fannot.NewFannot(input)
 
 	// Reset rules if a JSON is provided
-	if *rules != "" {
-		fa.Param = *fannot.NewParamFromJson(*rules)
+	if rules != "" {
+		fa.Param = *fannot.NewParamFromJson(rules)
 	}
 
 	// Parse the list of reference DB
-	fa.GetDBs(*refdb, *dirdb)
+	fa.GetDBs(refdb, dirdb)
 
 	// Load ips if provided
-	if *ipsin != "" {
-		err := fa.Ips.LoadIpsData(*ipsin)
+	if ipsin != "" {
+		err := fa.Ips.LoadIpsData(ipsin)
 		if err != nil {
 			panic(err)
 		}
@@ -55,7 +112,7 @@ REFDB:
 		threadChan := make(chan int)
 
 		// Launch parallel go routines
-		for i := 0; i < *threads; i++ {
+		for i := 0; i < threads; i++ {
 			go fa.FindFunction(queryChan, threadChan)
 		}
 
@@ -74,7 +131,7 @@ REFDB:
 		close(queryChan)
 
 		// Wait for all threads
-		for i := 0; i < *threads; i++ {
+		for i := 0; i < threads; i++ {
 			<-threadChan
 		}
 
@@ -85,10 +142,10 @@ REFDB:
 	}
 
 	// Complete with IPS annotation if provided
-	if *ipsin != "" {
+	if ipsin != "" {
 		fa.AddIpsAnnot()
 	}
 
 	// Printout the results
-	fa.WriteOut(*output)
+	fa.WriteOut(output)
 }
