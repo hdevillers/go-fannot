@@ -79,6 +79,10 @@ func main() {
 	if refdb == "" {
 		panic("You must provide at least one reference DB.")
 	}
+	// The number of threads must be greatter than 0
+	if threads <= 0 {
+		panic("At least one thread is required.")
+	}
 
 	// Initialize the functional annotation strucutre
 	fa := fannot.NewFannot(input)

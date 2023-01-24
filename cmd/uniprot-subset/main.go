@@ -100,9 +100,13 @@ func main() {
 	if output == "" {
 		panic("You must provide an output file name.")
 	}
-
+	// User must provide at least one keep/skip instruction
 	if ekeep == "" && eskip == "" && tkeep == "" && tskip == "" && dkeep == "" && dskip == "" {
 		panic("You must provide at least one keep/skip instruction.")
+	}
+	// Minimal length must be a positive integer
+	if lmin < 0 {
+		panic("The minimal protein length threshold must be positive.")
 	}
 
 	// Check if input is a single file or a base name for multiple files
