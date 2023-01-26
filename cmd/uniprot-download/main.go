@@ -17,6 +17,7 @@ var listMir bool
 var div string
 var listDiv bool
 var dir string
+var skipSum bool
 
 func init() {
 	// Define default values and usages
@@ -37,6 +38,8 @@ func init() {
 		listDivUsage   = "List available taxonomic divisions"
 		dirDefault     = "."
 		dirUsage       = "Output directory"
+		skipSumDefault = false
+		skipSumUsage   = "Do not make the checksum validation after download"
 	)
 
 	// Init. flags
@@ -54,6 +57,7 @@ func init() {
 	flag.BoolVar(&listMir, "M", listMirDefault, listMirUsage)
 	flag.BoolVar(&listDiv, "list-divisions", listDivDefault, listDivUsage)
 	flag.BoolVar(&listDiv, "D", listDivDefault, listDivUsage)
+	flag.BoolVar(&skipSum, "skip-sum", skipSumDefault, skipSumUsage)
 
 	// Shorthand associations
 	shand := map[string]string{
@@ -66,7 +70,7 @@ func init() {
 		"list-divisions": "D",
 	}
 
-	order := []string{"source", "mirror", "division", "output-dir", "list-sources", "list-mirrors", "list-divisions"}
+	order := []string{"source", "mirror", "division", "output-dir", "list-sources", "list-mirrors", "list-divisions", "skip-sum"}
 
 	// Custom usage display
 	flag.Usage = func() {
@@ -122,7 +126,7 @@ func main() {
 	// NOTE: Divisions are retrieved from the metalink file,
 	// hence, data must be retrieved before checking arguments.
 	fmt.Println("Retrieving Metlink file from UniProt...")
-	metalink.Retrieve()
+	metalink.Retrieve(mir)
 
 	// List division if required
 	if listDiv {
@@ -161,5 +165,5 @@ func main() {
 	}
 
 	// Launch FTP download
-	uniprot.FtpDownload(url, sum, dest)
+	uniprot.FtpDownload(url, sum, dest, skipSum)
 }

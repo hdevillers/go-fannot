@@ -18,7 +18,9 @@ import (
 
 // Metalink path
 const (
-	MetalinkPath = "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/RELEASE.metalink"
+	Metalink_us = "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/RELEASE.metalink"
+	Metalink_uk = "https://ftp.ebi.ac.uk/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/RELEASE.metalink"
+	Metalink_ch = "https://ftp.expasy.org/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/RELEASE.metalink"
 )
 
 // Metalink xml structure
@@ -26,7 +28,7 @@ type Metalink struct {
 	XMLName   xml.Name `xml:"metalink"`
 	Version   string   `xml:"version"`
 	Files     []File   `xml:"files>file"`
-	Mirrors   map[string]int
+	Mirrors   map[string]string
 	Databases map[string]int
 	Divisions map[string]int
 }
@@ -51,10 +53,10 @@ func NewMetalink() *Metalink {
 	m.Databases["trembl"] = 1
 
 	// Init. mirrors
-	m.Mirrors = make(map[string]int)
-	m.Mirrors["us"] = 1
-	m.Mirrors["uk"] = 1
-	m.Mirrors["ch"] = 1
+	m.Mirrors = make(map[string]string)
+	m.Mirrors["us"] = Metalink_us
+	m.Mirrors["uk"] = Metalink_uk
+	m.Mirrors["ch"] = Metalink_ch
 
 	// Init. divisions
 	m.Divisions = make(map[string]int)
@@ -63,9 +65,14 @@ func NewMetalink() *Metalink {
 }
 
 // Load metalink data from url
-func (m *Metalink) Retrieve() {
+func (m *Metalink) Retrieve(mir string) {
+	// Check mirror
+	if !m.CheckMirror(mir) {
+		panic(fmt.Sprintf("The mirror %s is not available.", mir))
+	}
+
 	// HTTP request
-	resp, err := http.Get(MetalinkPath)
+	resp, err := http.Get(m.Mirrors[mir])
 	if err != nil {
 		panic(err)
 	}
@@ -149,7 +156,7 @@ FILES:
 }
 
 // FTP download
-func FtpDownload(url, esum, dest string) {
+func FtpDownload(url, esum, dest string, skipsum bool) {
 	// Prepare the url
 	url = strings.Replace(url, "ftp://", "", 1)
 	path := strings.SplitN(url, "/", 2)
@@ -212,15 +219,19 @@ func FtpDownload(url, esum, dest string) {
 	defer in.Close()
 
 	// Check MD5
-	fmt.Printf("Calculating check sum (expecting: %s) of the downloaded file...\n", esum)
-	hash := md5.New()
-	io.Copy(hash, in)
-
-	// Obtained sum
-	osum := fmt.Sprintf("%x", hash.Sum(nil))
-	if osum != esum {
-		panic(fmt.Sprintf("Check sum failed,\nexpected: %s,\n obtained: %s\n", esum, osum))
+	if skipsum {
+		fmt.Printf("Checksum skipped, expected value is: %s.\n", esum)
 	} else {
-		fmt.Printf("Check sum (%s) is OK.\n", osum)
+		fmt.Printf("Calculating checksum (expecting: %s) of the downloaded file...\n", esum)
+		hash := md5.New()
+		io.Copy(hash, in)
+
+		// Obtained sum
+		osum := fmt.Sprintf("%x", hash.Sum(nil))
+		if osum != esum {
+			panic(fmt.Sprintf("Check sum failed,\nexpected: %s,\n obtained: %s\n", esum, osum))
+		} else {
+			fmt.Printf("Check sum (%s) is OK.\n", osum)
+		}
 	}
 }
