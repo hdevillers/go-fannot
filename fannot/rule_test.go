@@ -9,7 +9,7 @@ func TestRuleCheck(t *testing.T) {
 	minSim := float64(66.8)
 	minLra := float64(57.3)
 
-	r := Rule{minSim, minLra, "Test", false, false, 0}
+	r := Rule{minSim, minLra, "Test", false, 0}
 
 	// Testing parameter equality to threshold
 	if !r.Test(minSim, minLra) {
