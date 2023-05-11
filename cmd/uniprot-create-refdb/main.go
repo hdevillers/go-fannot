@@ -35,8 +35,6 @@ func init() {
 		owUsage      = "Indicate that annotations from this database can overwrite annotation from other databases"
 		unreDefault  = false
 		unreUsage    = "Indicate that annotations are unreviewed (e.g., from TrEmbl)"
-		gnDefault    = false
-		gnUsage      = "Indicate that gene names can be transfered in query features"
 		descDefault  = "No description"
 		descUsage    = "Short description of the reference database"
 	)
@@ -54,8 +52,6 @@ func init() {
 	flag.BoolVar(&ow, "w", owDefault, owUsage)
 	flag.BoolVar(&unre, "unreviewed", unreDefault, unreUsage)
 	flag.BoolVar(&unre, "u", unreDefault, unreUsage)
-	flag.BoolVar(&gn, "gene-name", gnDefault, gnUsage)
-	flag.BoolVar(&gn, "g", gnDefault, gnUsage)
 	flag.StringVar(&desc, "description", descDefault, descUsage)
 	flag.StringVar(&desc, "D", descDefault, descUsage)
 
@@ -67,12 +63,11 @@ func init() {
 		"equal":       "e",
 		"overwrite":   "w",
 		"unreviewed":  "u",
-		"gene-name":   "g",
 		"description": "D",
 	}
 
 	// Usage print order
-	order := []string{"input", "refdb-id", "refdb-dir", "equal", "overwrite", "unreviewed", "gene-name", "description"}
+	order := []string{"input", "refdb-id", "refdb-dir", "equal", "overwrite", "unreviewed", "description"}
 
 	// Custom usage display
 	flag.Usage = func() {
@@ -91,8 +86,8 @@ func main() {
 	}
 
 	// Create the refdb object
-	rdb := refdb.NewRefdb(outdir, name, input, desc, equal, ow, !unre, gn)
-
+	//rdb := refdb.NewRefdb(outdir, name, input, desc, equal, ow, !unre, gn)
+	rdb := refdb.NewRefdb(outdir, name, input, desc, equal, ow, !unre)
 	// Load the data
 	rdb.LoadSource()
 

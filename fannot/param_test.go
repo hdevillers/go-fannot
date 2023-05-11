@@ -24,9 +24,6 @@ func TestParamDefault(t *testing.T) {
 	}
 
 	// Check a given rule
-	if p.Rules[0].Cpy_gen != CPY_GEN_HIGH {
-		t.Error("Gene copy should be activated for the first default rule.")
-	}
 	if p.Rules[0].Min_sim != MIN_SIM_HIGH {
 		t.Errorf("Expected a minimal similarity of %.02f, found a similarity of %.02f.", MIN_SIM_HIGH, p.Rules[0].Min_sim)
 	}

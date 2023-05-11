@@ -3,7 +3,7 @@
     "DefaultProduct": "hypothetical protein",
     "DefaultGeneName": "",
     "DefaultFunction": "",
-    "TemplateNote": "{Prefix}||{BdName}|{BdId} ||{Species} ||{LocusTag} ||{GeneName} ||{LongDesc}",
+    "TemplateNote": "{Prefix}||{DbName}|{DbId} ||{Species} ||{LocusTag} ||{GeneName} ||{LongDesc}",
     "TemplateProduct": "{ShortDesc}::ToLwr::GnPn",
     "TemplateGeneName": "{GeneName}",
     "TemplateFunction": "",
@@ -14,7 +14,6 @@
             "Min_sim" : 80.0,
             "Min_lra" : 0.8,
             "Pre_ann" : "highly similar to",
-            "Cpy_gen" : true,
             "Ovr_wrt" : true,
             "Hit_sta" : 3
         },
@@ -22,7 +21,6 @@
             "Min_sim" : 50.0,
             "Min_lra" : 0.7,
             "Pre_ann" : "similar to",
-            "Cpy_gen" : false,
             "Ovr_wrt" : false,
             "Hit_sta" : 2
         },
@@ -30,7 +28,6 @@
             "Min_sim" : 30.0,
             "Min_lra" : 0.6,
             "Pre_ann" : "weakly similar to",
-            "Cpy_gen" : false,
             "Ovr_wrt" : false,
             "Hit_sta" : 1
         }

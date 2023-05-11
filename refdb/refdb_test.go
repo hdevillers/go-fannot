@@ -21,7 +21,7 @@ func TestCreateRefdb(t *testing.T) {
 	}
 
 	// Init. Refdb object
-	rdb := NewRefdb(outdir, name, input, desc, true, false, true, true)
+	rdb := NewRefdb(outdir, name, input, desc, true, false, true)
 
 	// Load the data
 	rdb.LoadSource()
