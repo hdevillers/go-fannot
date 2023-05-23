@@ -21,10 +21,10 @@ var desc string
 func init() {
 	// Define default values and usages
 	const (
-		toolName     = "uniprot-create-refdb"
-		toolDesc     = "Create a reference database from an UniProt data file"
+		toolName     = "fasta-create-refdb"
+		toolDesc     = "Create a reference database from a Fasta file"
 		inputDefault = ""
-		inputUsage   = "Input Fasta data file"
+		inputUsage   = "Input Fasta file"
 		refdbDefault = ""
 		refdbUsage   = "Id of the reference database to create"
 		dirdbDefault = ""
