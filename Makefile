@@ -37,6 +37,10 @@ install:
 	cp bin/uniprot-download $(INSTALL_DIR)/uniprot-download
 	cp bin/fannot-run $(INSTALL_DIR)/fannot-run
 	cp bin/refdb-info $(INSTALL_DIR)/refdb-info
+	cp scripts/AnnotationsToSeqFiles.py $(INSTALL_DIR)/AnnotationsToSeqFiles.py
+	chmod 755 $(INSTALL_DIR)/AnnotationsToSeqFiles.py
+	cp scripts/SeqFilesToRefFasta.py $(INSTALL_DIR)/SeqFilesToRefFasta.py
+	chmod 755 $(INSTALL_DIR)/SeqFilesToRefFasta.py
 
 uninstall:
 	rm -f $(INSTALL_DIR)/uniprot-count
@@ -48,3 +52,5 @@ uninstall:
 	rm -f $(INSTALL_DIR)/uniprot-download
 	rm -f $(INSTALL_DIR)/fannot-run
 	rm -f $(INSTALL_DIR)/refdb-info
+	rm -f $(INSTALL_DIR)/AnnotationsToSeqFiles.py
+	rm -f $(INSTALL_DIR)/SeqFilesToRefFasta.py
