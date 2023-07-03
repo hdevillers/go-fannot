@@ -112,12 +112,14 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 			panic(err)
 		}
 
-		// Init. the Result object for the current query
-		fa.Results[qi] = Result{
-			Note:     fa.Param.DefaultNote,
-			Product:  fa.Param.DefaultProduct,
-			GeneName: fa.Param.DefaultGeneName,
-			Function: fa.Param.DefaultFunction,
+		// Init. the Result object for the current query if not finished yet
+		if !fa.Finished[qi] {
+			fa.Results[qi] = Result{
+				Note:     fa.Param.DefaultNote,
+				Product:  fa.Param.DefaultProduct,
+				GeneName: fa.Param.DefaultGeneName,
+				Function: fa.Param.DefaultFunction,
+			}
 		}
 
 		// Init. a BestHit object
@@ -168,7 +170,7 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 					// An overwrite is possible only if the stored
 					// annotation is "similar" and the new hit is
 					// better.
-					if fa.Results[qi].Status > fa.Param.Rules[bestHit.IdRule].Hit_sta {
+					if fa.Results[qi].Status < fa.Param.Rules[bestHit.IdRule].Hit_sta {
 						copy = true
 						ow = true
 					}
