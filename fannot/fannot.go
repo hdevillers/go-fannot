@@ -39,7 +39,7 @@ func NewFannot(i string) *Fannot {
 	// Load the query sequences
 	fa.NQueries = utils.LoadSeqInArray(i, "fasta", &fa.Queries)
 
-	// Init. BLAST and NEEDLE parameter setings
+	// Init. BLAST and NEEDLE parameter settings
 	fa.BlastPar = *blast.NewParam()
 	fa.NeedlePar = *needle.NewParam()
 
@@ -57,9 +57,9 @@ func NewFannot(i string) *Fannot {
 }
 
 /*
-	Get reference database from input arguments
-	i is the list of DB ids (coma sep)
-	d is the directory path that contain DBs
+Get reference database from input arguments
+i is the list of DB ids (coma sep)
+d is the directory path that contain DBs
 */
 func (fa *Fannot) GetDBs(i, d string) {
 	// split ids
@@ -147,10 +147,9 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 				}
 			}
 
-			// Check if the best hit satify a rule
+			// Check if the best hit satisfy a rule
 		CHECK:
 			for ri, rule := range fa.Param.Rules {
-				//if bestHitSim >= rule.Min_sim && bestHitLenRatio >= rule.Min_lra {
 				if rule.Test(bestHit.Similarity, bestHit.LengthRatio) {
 					bestHit.IdRule = ri
 					break CHECK
@@ -168,8 +167,8 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 				} else if fa.DBs[fa.DBi].OverWrite && fa.Param.Rules[bestHit.IdRule].Ovr_wrt {
 					// The current DB allows overwrite
 					// An overwrite is possible only if the stored
-					// annotation is "similar" and the new hit is
-					// better.
+					// annotation has a hit status lower than the
+					// hit status of the retained rule
 					if fa.Results[qi].Status < fa.Param.Rules[bestHit.IdRule].Hit_sta {
 						copy = true
 						ow = true
