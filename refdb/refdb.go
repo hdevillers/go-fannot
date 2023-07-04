@@ -120,6 +120,41 @@ func (r *Refdb) LoadSource() {
 	}
 }
 
+func (r *Refdb) LoadFasta() {
+	// Init. the fasta reader
+	fr := seqio.NewReader(r.Source, "fasta", false)
+	fr.CheckPanic()
+	defer fr.Close()
+
+	// Init. the fasta writer
+	r.Fasta = r.Root + "/" + FASTA_PATH
+	fw := seqio.NewWriter(r.Fasta, "fasta", false)
+	defer fw.Close()
+
+	// Scan entries
+	ne := 0
+	for fr.Next() {
+		fr.CheckPanic()
+		ne++
+
+		// Extract the sequence and copy it in the output fasta
+		fw.Write(fr.Seq())
+	}
+	r.Nprot = ne
+
+	// Prepare the BLASTDB
+	r.Blastdb = r.Root + "/" + BLASTDB_PATH
+	err := exec.Command("makeblastdb",
+		"-in", r.Fasta,
+		"-out", r.Blastdb,
+		"-dbtype", "prot",
+		"-input_type", "fasta",
+	).Run()
+	if err != nil {
+		panic(err)
+	}
+}
+
 func (r *Refdb) PrintInfoHeader() {
 	fmt.Println("ID\t#Proteins\tDescription")
 }

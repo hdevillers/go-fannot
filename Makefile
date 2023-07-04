@@ -8,6 +8,7 @@ build:
 	go build -o bin/uniprot-count ./cmd/uniprot-count/main.go
 	go build -o bin/uniprot-subset ./cmd/uniprot-subset/main.go
 	go build -o bin/uniprot-create-refdb ./cmd/uniprot-create-refdb/main.go
+	go build -o bin/fasta-create-refdb ./cmd/fasta-create-refdb/main.go
 	go build -o bin/uniprot-prune ./cmd/uniprot-prune/main.go
 	go build -o bin/uniprot-split ./cmd/uniprot-split/main.go
 	go build -o bin/uniprot-download ./cmd/uniprot-download/main.go
@@ -30,18 +31,26 @@ install:
 	cp bin/uniprot-count $(INSTALL_DIR)/uniprot-count
 	cp bin/uniprot-subset $(INSTALL_DIR)/uniprot-subset
 	cp bin/uniprot-create-refdb $(INSTALL_DIR)/uniprot-create-refdb
+	cp bin/fasta-create-refdb $(INSTALL_DIR)/fasta-create-refdb
 	cp bin/uniprot-prune $(INSTALL_DIR)/uniprot-prune
 	cp bin/uniprot-split $(INSTALL_DIR)/uniprot-split
 	cp bin/uniprot-download $(INSTALL_DIR)/uniprot-download
 	cp bin/fannot-run $(INSTALL_DIR)/fannot-run
 	cp bin/refdb-info $(INSTALL_DIR)/refdb-info
+	cp scripts/AnnotationsToSeqFiles.py $(INSTALL_DIR)/AnnotationsToSeqFiles.py
+	chmod 755 $(INSTALL_DIR)/AnnotationsToSeqFiles.py
+	cp scripts/SeqFilesToRefFasta.py $(INSTALL_DIR)/SeqFilesToRefFasta.py
+	chmod 755 $(INSTALL_DIR)/SeqFilesToRefFasta.py
 
 uninstall:
 	rm -f $(INSTALL_DIR)/uniprot-count
 	rm -f $(INSTALL_DIR)/uniprot-subset
 	rm -f $(INSTALL_DIR)/uniprot-create-refdb
+	rm -f $(INSTALL_DIR)/fasta-create-refdb
 	rm -f $(INSTALL_DIR)/uniprot-prune
 	rm -f $(INSTALL_DIR)/uniprot-split
 	rm -f $(INSTALL_DIR)/uniprot-download
 	rm -f $(INSTALL_DIR)/fannot-run
 	rm -f $(INSTALL_DIR)/refdb-info
+	rm -f $(INSTALL_DIR)/AnnotationsToSeqFiles.py
+	rm -f $(INSTALL_DIR)/SeqFilesToRefFasta.py
