@@ -105,7 +105,7 @@ func TestCreateRefdbNotEqual(t *testing.T) {
 	}
 }
 
-// Testing non-equality
+// Testing hit number
 func TestCreateRefdbHitNumber(t *testing.T) {
 	input := "../examples/testdb/test_hitnumber.fasta"
 	name := "TEST_HIT_NUMBER"
@@ -136,5 +136,65 @@ func TestCreateRefdbHitNumber(t *testing.T) {
 	_, err = os.Stat("../examples/refdb/TEST_HIT_NUMBER/config.json")
 	if err != nil {
 		t.Fatal("The Refdb config file (json) does not exist.")
+	}
+}
+
+// Testing similarity and overwrite
+func TestCreateRefdbSimilarityLevels(t *testing.T) {
+	inputs := []string{
+		"test_highly.fasta",
+		"test_similar.fasta",
+		"test_weakly.fasta",
+	}
+	names := []string{
+		"TEST_HIGHLY",
+		"TEST_SIMILAR",
+		"TEST_WEAKLY",
+	}
+	descs := []string{
+		"REFDB to test highly similar hit",
+		"REFDB to test similar hit",
+		"REFDB to test weakly similar hit",
+	}
+	indir := "../examples/testdb/"
+	outdir := "../examples/refdb/"
+	equal := false
+
+	// Create all dbs
+	for i := range inputs {
+		dbdir_ow := outdir + names[i] + "_OW"
+		dbdir_nw := outdir + names[i] + "_NW"
+
+		// Delete possible data from a previous build
+		_, err := os.Stat(dbdir_ow)
+		if err == nil {
+			err = os.RemoveAll(dbdir_ow)
+		}
+		_, err = os.Stat(dbdir_nw)
+		if err == nil {
+			err = os.RemoveAll(dbdir_nw)
+		}
+
+		// Init. Refdb objects
+		rdb_ow := NewRefdb(outdir, names[i]+"_OW", indir+inputs[i], descs[i]+", overwrritable", equal, true, true)
+		rdb_nw := NewRefdb(outdir, names[i]+"_NW", indir+inputs[i], descs[i]+", non-overwritable", equal, false, true)
+
+		// Load the data
+		rdb_ow.LoadFasta()
+		rdb_nw.LoadFasta()
+
+		// Save the json
+		rdb_ow.WriteJson()
+		rdb_nw.WriteJson()
+
+		// Check if files have been created
+		_, err = os.Stat(dbdir_ow + "/config.json")
+		if err != nil {
+			t.Fatal("The Refdb " + dbdir_ow + " config file (json) does not exist.")
+		}
+		_, err = os.Stat(dbdir_nw + "/config.json")
+		if err != nil {
+			t.Fatal("The Refdb " + dbdir_nw + " config file (json) does not exist.")
+		}
 	}
 }

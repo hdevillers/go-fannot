@@ -1,0 +1,38 @@
+>refdb_01 Actin protein::ACT1::refdb_01::Unknown species::Actin protein
+MEDEVAALVIDNGSGMCKAGFAGDDAPSAVFPSIVGRPRHQGIMVGMGQKDSYVGDEAQS
+KRGILTLRYPIEHGVVTNWDDMEKIWHHTFYNELRVAPEEHPVLLTEAPMNPKSNREKMT
+QILFETFNVPAFYVNIQAVLSLYSSGRTTGIVLDSGDGVTHVVPIYAGFSLPHGILRIDL
+AGRDLTDYLMKILSERGYTFSTTAEREIVSDIKEKLCYVALDFEQEMQTSAQSSAIEKSY
+ELPDGQVITIGNERFRAAEALFSPSDLGLESAGIDQTTYNSIIKCDLDVRRELYGNIVMS
+GGTTMFPGIAERMQKEITALAPSSMKVKIIAPPERKYSVWIGGSILASLSTFQQMWISKQ
+EYDESGPSIVHHKCF
+>Q12354 Acyl-protein thioesterase 1::::YLR118C::Saccharomyces cerevisiae (strain ATCC 204508 / S288c) (Baker's yeast).::hydrolyzes fatty acids from S-acylated cysteine residues in proteins with a strong preference for palmitoylated G-alpha proteins over other acyl substrates; mediates the deacylation of G-alpha proteins such as GPA1 in vivo, but has weak or no activity toward palmitoylated Ras proteins; has weak lysophospholipase activity in vitro; however such activity may not exist in vivo
+MNGLRVAAKIQPARQTIIFLHGLGDTGSGWGFLAQYLQQRDPAAFQHTNFVFPNAPELHV
+TANGGALMPAWFDILEWDPSFSKVDSDGFMNSLNSIEKTVKQEIDKGIKPEQIIIGGFSQ
+GAALALATSVTLPWKIGGIVALSGFCSIPGILKQHKNGINVKTPIFHGHGDMDPVVPIGL
+GIKAKQFYQDSCEIQNYEFKVYKGMAHSTVPDELEDLASFIKKSLSS
+>P25641 Putative lipase ATG15::ATG15::YCR068W::Saccharomyces cerevisiae (strain ATCC 204508 / S288c) (Baker's yeast).::lipase which is essential for lysis of subvacuolar cytoplasm to vacuole targeted bodies and intravacuolar autophagic bodies; involved in the lysis of intravacuolar multivesicular body (MVB) vesicles; the intravacuolar membrane disintegration by ATG15 is critical to life span extension
+MLHKSPSRKRFASPLHLGCILTLTVLCLIAYYFALPDYLSVGKSSSRGAMDQKSDGTFRL
+KSIYRHGVGANHRLHQRLEVTPEVISAAGMLYQETTTQGQDFEDQEPLWTTNAEYATTNP
+FDFEFELRRMPLLMKRMKERDPEFIESYIYGETYMTEEEEHAMWIDDDIVAPNITDRGTV
+VSLALMSSNAYVRIPQTGDWRNVTEPWNETEPEDFGWDGDGIRGHVFYNEVENIVVLSIK
+GTSAQGLPGSGEDETTGNDKINDNLLFSCCCARVSYLWTTVCDCYVKSYICDESCLEKEL
+RRKDRFYSAVVDIYKGVLKEYPDAAIWVTGHSLGGALASLLGRTFGLPAVAFESPGELLP
+SKRLHLPFPPGLPSYMEGIWHFGHNADPIFMGTCNGASSSCSLVGYAMETACHTGRVCVY
+DVVNDKGWSVNMFNHRIHKVIDEVLLGYEQAAKCVEPEPCVDCYNWKFIPSRDWESSSRL
+ITKTKSHAAPTTTTRTTATTTSSSTCVGRNWLGFCTKYEL
+>P40471 NADPH-dependent 1-acyldihydroxyacetone phosphate reductase::AYR1::YIL124W::Saccharomyces cerevisiae (strain ATCC 204508 / S288c) (Baker's yeast).::can convert acyl and alkyl dihydroxyacetone-phosphate (DHAP) into glycerolipids and ether lipids, respectively; required for the biosynthesis of phosphatidic acid via the DHAP pathway, where it reduces 1-acyl DHAP to lysophosphatidic acid (LPA); also has triacylglycerol (TAG) lipase activity; involved in the mobilization of the non-polar storage lipids triacylglycerols (TAGs) from lipid particles by hydrolysis of TAGs; required for spore germination; plays a role in cell wall biogenesis, but this effect may be indirect by affecting the activities of cell wall synthesis enzymes; lipolysis of TAG by AYR1 is essential for starvation-induced autophagy; forms an NADPH- regulated cation-selective channel in the mitochondrial outer membrane
+MSELQSQPKKIAVVTGASGGIGYEVTKELARNGYLVYACARRLEPMAQLAIQFGNDSIKP
+YKLDISKPEEIVTFSGFLRANLPDGKLDLLYNNAGQSCTFPALDATDAAVEQCFKVNVFG
+HINMCRELSEFLIKAKGTIVFTGSLAGVVSFPFGSIYSASKAAIHQYARGLHLEMKPFNV
+RVINAITGGVATDIADKRPLPETSIYNFPEGREAFNSRKTMAKDNKPMPADAYAKQLVKD
+ILSTSDPVDVYRGTFANIMRFVMIFVPYWLLEKGLSKKFKLDKVNNALKSKQKNKDD
+>P53264 Cardiolipin-specific deacylase 1, mitochondrial::CLD1::YGR110W::Saccharomyces cerevisiae (strain ATCC 204508 / S288c) (Baker's yeast).::mitochondrial cardiolipin-specific phospholipase which deacylates de novo synthesized cardiolipin (CL); part of the remodeling process of cardiolipin, which involves deacylation-reacylation of premature cardiolipin; has a strong substrate preference for palmitic acid residues and generates monolysocardiolipin (MLCL) for TAZ1- dependent reacylation with unsaturated fatty acids; the hydrolytic selectivity of the enzyme toward C16- CL substrates contributes to the preservation of C18:1-containing CL species; has high specificity towards peroxidized cardiolipids CL(OX); required to mitigate oxidative stress by removing CL(OX)
+MFKSTLNSIIRRPLKGFQLLRGADSSNTRPQSPRASARDVTEKQILRTPSAPTAIPLREI
+IYRVPSLFPRPLEDSVKDFRDFIKNEDAFQTELLKTLPFYPTPSESKTARLIRTVVDDEG
+NYINEFCIRPRKTSVPEADLKHLVFIHGYGAGLGFFIKNFEDIPLLDNEWCIHAIDLPGY
+GFSSRPKFPFEYPRDNIHSVQDWFHERIHTWFSKRNLLNRPEKNIVMAHSLGSYLMALYL
+QKYKESPSFKKLILCSPAGVSYRDFNNTASEVEKWKPPPWWYVKLWDRNISPFTLVRNFR
+QLGSKITSGWSYRRFKHILNGDPEQSKRFEALHRYAYAIFNKRGSGEYLLSFALKCGGEP
+RLSLEQQLFDGKKSDILKNSNCDWLWLYGDDDWMDVNGGLRVSRFLKEKLKQKSNVIIVP
+HSGHHLYLDNYKFFNNILTKEMQKI
