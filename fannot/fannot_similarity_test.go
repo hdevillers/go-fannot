@@ -6,7 +6,7 @@ import (
 )
 
 // Test a simple highly similar match
-func TestRefdbHighlySimilar(t *testing.T) {
+func TestHighlySimilar(t *testing.T) {
 	// Initiate the fannot object
 	fa := NewFannot("../examples/queries/query_01.fasta")
 
@@ -75,7 +75,7 @@ func TestRefdbHighlySimilar(t *testing.T) {
 }
 
 // Test a simple similar match
-func TestRefdbSimilar(t *testing.T) {
+func TestSimilar(t *testing.T) {
 	// Initiate the fannot object
 	fa := NewFannot("../examples/queries/query_01.fasta")
 
@@ -147,7 +147,7 @@ func TestRefdbSimilar(t *testing.T) {
 }
 
 // Test a simple weakly similar match
-func TestRefdbWeaklySimilar(t *testing.T) {
+func TestWeaklySimilar(t *testing.T) {
 	// Initiate the fannot object
 	fa := NewFannot("../examples/queries/query_01.fasta")
 

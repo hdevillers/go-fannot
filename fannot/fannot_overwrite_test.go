@@ -6,7 +6,7 @@ import (
 )
 
 // Test overwrite a weakly with a highly
-func TestRefdbOverwrite01(t *testing.T) {
+func TestOverwrite01(t *testing.T) {
 	// Initiate the fannot object
 	fa := NewFannot("../examples/queries/query_01.fasta")
 
@@ -76,7 +76,7 @@ REFDB:
 }
 
 // REFDB prevent from overwrite
-func TestRefdbOverwrite02(t *testing.T) {
+func TestOverwrite02(t *testing.T) {
 	// Initiate the fannot object
 	fa := NewFannot("../examples/queries/query_01.fasta")
 
@@ -154,7 +154,7 @@ REFDB:
 }
 
 // JSON (max status) prevents from overwriting
-func TestRefdbOverwrite03(t *testing.T) {
+func TestOverwrite03(t *testing.T) {
 	// Initiate the fannot object
 	fa := NewFannot("../examples/queries/query_01.fasta")
 
@@ -224,7 +224,7 @@ REFDB:
 }
 
 // JSON (max status) allows overwriting
-func TestRefdbOverwrite04(t *testing.T) {
+func TestOverwrite04(t *testing.T) {
 	// Initiate the fannot object
 	fa := NewFannot("../examples/queries/query_01.fasta")
 
