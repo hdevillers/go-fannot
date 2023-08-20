@@ -8,17 +8,18 @@ import (
 
 // Default thresholds
 const (
-	NB_HIT_CHECK int    = 3
-	UNKNOWN_FUNC string = "hypothetical protein"
-	DFT_NOTE     string = "hypothetical protein"
-	DFT_PRODUCT  string = "hypothetical protein"
-	DFT_GENENAME string = ""
-	DFT_FUNCTION string = ""
-	DFT_MAXSTSOW int    = 1
-	TPL_NOTE     string = "{Prefix}||{DbName}|{DbId} ||{Species} ||{LocusTag} ||{GeneName} ||{LongDesc}"
-	TPL_PRODUCT  string = "{ShortDesc}::ToLwr::GnPn"
-	TPL_GENENAME string = "{GeneName}"
-	TPL_FUNCTION string = ""
+	NB_HIT_CHECK int     = 3
+	UNKNOWN_FUNC string  = "hypothetical protein"
+	DFT_NOTE     string  = "hypothetical protein"
+	DFT_PRODUCT  string  = "hypothetical protein"
+	DFT_GENENAME string  = ""
+	DFT_FUNCTION string  = ""
+	DFT_MAXSTSOW int     = 1
+	DFT_MINSIDOW float64 = 5.0
+	TPL_NOTE     string  = "{Prefix}||{DbName}|{DbId} ||{Species} ||{LocusTag} ||{GeneName} ||{LongDesc}"
+	TPL_PRODUCT  string  = "{ShortDesc}::ToLwr::GnPn"
+	TPL_GENENAME string  = "{GeneName}"
+	TPL_FUNCTION string  = ""
 )
 
 // Global parameter object
@@ -34,6 +35,7 @@ type Param struct {
 	NbHitCheck       int
 	Rules            []Rule
 	MaxStatusOW      int
+	MinSimDiffOW     float64
 }
 
 // Create a new parameter object with default values
@@ -46,6 +48,7 @@ func NewParam() *Param {
 	p.DefaultGeneName = DFT_GENENAME
 	p.DefaultFunction = DFT_FUNCTION
 	p.MaxStatusOW = DFT_MAXSTSOW
+	p.MinSimDiffOW = DFT_MINSIDOW
 
 	// Init. templates
 	p.TemplateNote = TPL_NOTE

@@ -9,6 +9,7 @@
     "TemplateFunction": "",
     "NbHitCheck": 3,
     "MaxStatusOW": 1,
+    "MinSimDiffOW": 5.0,
     "Rules" : [
         {
             "Min_sim" : 80.0,

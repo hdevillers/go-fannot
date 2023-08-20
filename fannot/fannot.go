@@ -172,6 +172,14 @@ func (fa *Fannot) FindFunction(queryChan chan int, threadChan chan int) {
 					if fa.Results[qi].Status < fa.Param.Rules[bestHit.IdRule].Hit_sta {
 						copy = true
 						ow = true
+					} else if fa.Results[qi].Status == fa.Param.Rules[bestHit.IdRule].Hit_sta {
+						// In that case, similarity level must be really improved
+						// Compute similarity difference
+						simdiff := bestHit.Similarity - fa.Results[qi].Similarity
+						if simdiff >= fa.Param.MinSimDiffOW {
+							copy = true
+							ow = true
+						}
 					}
 				}
 
