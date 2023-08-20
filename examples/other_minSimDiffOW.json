@@ -1,0 +1,36 @@
+{
+    "DefaultNote": "hypothetical protein",
+    "DefaultProduct": "hypothetical protein",
+    "DefaultGeneName": "",
+    "DefaultFunction": "",
+    "TemplateNote": "{Prefix}||{DbName}|{DbId} ||{Species} ||{LocusTag} ||{GeneName} ||{LongDesc}",
+    "TemplateProduct": "{ShortDesc}::ToLwr::GnPn",
+    "TemplateGeneName": "{GeneName}",
+    "TemplateFunction": "",
+    "NbHitCheck": 3,
+    "MaxStatusOW": 2,
+    "MinSimDiffOW": 10.0,
+    "Rules" : [
+        {
+            "Min_sim" : 80.0,
+            "Min_lra" : 0.8,
+            "Pre_ann" : "highly similar to",
+            "Ovr_wrt" : true,
+            "Hit_sta" : 3
+        },
+        {
+            "Min_sim" : 50.0,
+            "Min_lra" : 0.7,
+            "Pre_ann" : "similar to",
+            "Ovr_wrt" : true,
+            "Hit_sta" : 2
+        },
+        {
+            "Min_sim" : 30.0,
+            "Min_lra" : 0.6,
+            "Pre_ann" : "weakly similar to",
+            "Ovr_wrt" : false,
+            "Hit_sta" : 1
+        }
+    ]
+}

@@ -198,3 +198,51 @@ func TestCreateRefdbSimilarityLevels(t *testing.T) {
 		}
 	}
 }
+
+// Additional DB for testing overwrite
+func TestCreateRefdbOverwrite(t *testing.T) {
+	inputs := []string{
+		"test_ow1.fasta",
+		"test_ow2.fasta",
+		"test_ow3.fasta",
+	}
+	names := []string{
+		"TEST_OW1",
+		"TEST_OW2",
+		"TEST_OW3",
+	}
+	descs := []string{
+		"REFDB to test ow similarity 51",
+		"REFDB to test ow similarity 58",
+		"REFDB to test ow similarity 74",
+	}
+	indir := "../examples/testdb/"
+	outdir := "../examples/refdb/"
+	equal := false
+
+	// Create all dbs
+	for i := range inputs {
+		dbdir_ow := outdir + names[i]
+
+		// Delete possible data from a previous build
+		_, err := os.Stat(dbdir_ow)
+		if err == nil {
+			err = os.RemoveAll(dbdir_ow)
+		}
+
+		// Init. Refdb objects
+		rdb_ow := NewRefdb(outdir, names[i], indir+inputs[i], descs[i], equal, true, true)
+
+		// Load the data
+		rdb_ow.LoadFasta()
+
+		// Save the json
+		rdb_ow.WriteJson()
+
+		// Check if files have been created
+		_, err = os.Stat(dbdir_ow + "/config.json")
+		if err != nil {
+			t.Fatal("The Refdb " + dbdir_ow + " config file (json) does not exist.")
+		}
+	}
+}
