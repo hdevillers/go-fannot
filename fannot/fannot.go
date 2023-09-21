@@ -233,7 +233,7 @@ func (fa *Fannot) AddIpsAnnot() {
 		ips, ok := fa.Ips.Data[gid]
 		if ok {
 			// Sort IPS keys in order to avoid random IPS order
-			ipsids := make([]string, len(ips.KeyValue))
+			ipsids := make([]string, 0)
 			for ipsid := range ips.KeyValue {
 				ipsids = append(ipsids, ipsid)
 			}
