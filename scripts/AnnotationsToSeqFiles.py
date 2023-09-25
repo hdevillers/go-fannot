@@ -5,6 +5,7 @@ from Bio import SeqIO
 import glob
 from os.path import exists
 from os.path import basename
+import re
 import sys
 
 def fatal(msg):
@@ -32,6 +33,7 @@ def main(argv):
     parser.add_argument('-i', '--id-qualifier', default="locus_tag", help="Target qualifier to get the id of a feature.")
     parser.add_argument('-q', '--wanted-qualifiers', default="note,product,gene", help="List of qualifier to transfer (coma separator).")
     parser.add_argument('-c', '--copy-gene-status', default=1, type=int, help="Minimal status value to allow gene name transfer.")
+    parser.add_argument('-p', '--putative-status', default=2, type=int, help="Maximal status value to add 'putative' before the product description.")
     args = parser.parse_args()
 
     # Check argument values
@@ -81,6 +83,13 @@ def main(argv):
             if ann_data[dt[0]]['status'] < args.copy_gene_status:
                 # Delete gene data to prevent copy
                 ann_data[dt[0]]['gene'] = ''
+
+            # Check 'putative' rule
+            if ann_data[dt[0]]['status'] <= args.putative_status and ann_data[dt[0]]['status'] > 0:
+                # Do not add putative if putative is already indicated
+                if not re.match('putative', dt[1]):
+                    # Add putative in the product description
+                    ann_data[dt[0]]['product'] = 'putative ' + dt[1]
 
             # Read next line
             line = f.readline()
