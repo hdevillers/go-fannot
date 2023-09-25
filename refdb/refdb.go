@@ -98,6 +98,9 @@ func (r *Refdb) LoadSource() {
 		swr.PanicOnError()
 		ne++
 
+		// Entry descriptions may contain unwanted upper cases
+		e.FixUpperCases()
+
 		desc := e.Desc + "::" + e.Name + "::" + e.Locus + "::" + e.Organism + "::" + e.Function
 		nseq := seq.NewSeq(e.Access)
 		nseq.Desc = desc

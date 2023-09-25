@@ -3,6 +3,7 @@ package uniprot
 import (
 	"fmt"
 	"regexp"
+	"unicode"
 )
 
 type Entry struct {
@@ -82,6 +83,22 @@ func (e *Entry) TestDescription(re string) bool {
 	}
 
 	return false
+}
+
+func (e *Entry) FixUpperCases() {
+	// Remove upper case in description
+	if regexp.MustCompile(`^[A-Z][a-z ]`).MatchString(e.Desc) {
+		tmp := []rune(e.Desc)
+		tmp[0] = unicode.ToLower(tmp[0])
+		e.Desc = string(tmp)
+	}
+
+	// Remove upper case in function
+	if regexp.MustCompile(`^[A-Z][a-z ]`).MatchString(e.Function) {
+		tmp := []rune(e.Function)
+		tmp[0] = unicode.ToLower(tmp[0])
+		e.Function = string(tmp)
+	}
 }
 
 func (e *Entry) Test(tk, ts, ek, es string) bool {
