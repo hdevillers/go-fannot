@@ -71,7 +71,7 @@ func (i *Ips) LoadIpsData(f string) error {
 		elem := strings.Split(line, "\t")
 
 		// Only lines with 13 elements contain a IPR ID
-		if len(elem) == 13 {
+		if len(elem) >= 13 {
 			// Check if the prediction have a proper IPS ID
 			if elem[11] != "-" {
 				// Check the E-value (or score)
