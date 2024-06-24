@@ -4,6 +4,12 @@ ifdef prefix
 	INSTALL_DIR = $(prefix)
 endif
 
+DPT = no
+ifdef do_python_tests
+	DPT = yes
+endif
+export DO_PYTHON_TESTS := $(DPT)
+
 build:
 	go build -o bin/uniprot-count ./cmd/uniprot-count/main.go
 	go build -o bin/uniprot-subset ./cmd/uniprot-subset/main.go
@@ -18,6 +24,7 @@ build:
 test:
 	go test -v tools/tools_test.go
 	go test -v refdb/refdb.go refdb/refdb_test.go
+	go test -v refdb/refdb_fasta_test.go
 	go test -v fannot/rule.go fannot/rule_test.go
 	go test -v fannot/besthit.go fannot/besthit_test.go
 	go test -v fannot/fields.go fannot/fields_test.go
