@@ -169,10 +169,16 @@ func TestCreateRefdbSimilarityLevels(t *testing.T) {
 		_, err := os.Stat(dbdir_ow)
 		if err == nil {
 			err = os.RemoveAll(dbdir_ow)
+			if err != nil {
+				t.Fatal("Failed to remove data from previous tests.")
+			}
 		}
 		_, err = os.Stat(dbdir_nw)
 		if err == nil {
 			err = os.RemoveAll(dbdir_nw)
+			if err != nil {
+				t.Fatal("Failed to remove data from previous tests.")
+			}
 		}
 
 		// Init. Refdb objects
@@ -228,6 +234,9 @@ func TestCreateRefdbOverwrite(t *testing.T) {
 		_, err := os.Stat(dbdir_ow)
 		if err == nil {
 			err = os.RemoveAll(dbdir_ow)
+			if err != nil {
+				t.Fatal("Failed to remove data from previous tests.")
+			}
 		}
 
 		// Init. Refdb objects
