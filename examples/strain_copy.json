@@ -1,0 +1,22 @@
+{
+    "DefaultNote": "hypothetical protein",
+    "DefaultProduct": "hypothetical protein",
+    "DefaultGeneName": "",
+    "DefaultFunction": "",
+    "TemplateNote": "{LongDesc}",
+    "TemplateProduct": "{ShortDesc}",
+    "TemplateGeneName": "{GeneName}",
+    "TemplateFunction": "",
+    "NbHitCheck": 3,
+    "MaxStatusOW": 0,
+    "MinSimDiffOW": 5.0,
+    "Rules" : [
+        {
+            "Min_sim" : 90.0,
+            "Min_lra" : 0.9,
+            "Pre_ann" : "",
+            "Ovr_wrt" : true,
+            "Hit_sta" : 1
+        }
+    ]
+}

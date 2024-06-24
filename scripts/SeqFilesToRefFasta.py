@@ -55,7 +55,7 @@ def main(argv):
                     if feature.type == 'CDS':
                         id = "CDS_%05d" % (len(proteins))
                         gene_name = ""
-                        procuct = ""
+                        product = ""
                         note=""
                         function=""
                         if args.id_qualifier in feature.qualifiers:
@@ -65,10 +65,10 @@ def main(argv):
                         if 'product' in feature.qualifiers:
                             product = feature.qualifiers['product'][0]
                         if 'gene' in feature.qualifiers:
-                            gene = feature.qualifiers['gene'][0]
+                            gene_name = feature.qualifiers['gene'][0]
                         if 'function' in feature.qualifiers:
                             function = feature.qualifiers['function'][0]
-                        protein = feature.translate(record.seq, cds=False)
+                        protein = feature.translate(record.seq, cds=False, to_stop=True)
                         prot_record = SeqRecord(
                             protein,
                             id = id,
