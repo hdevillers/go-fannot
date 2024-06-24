@@ -45,7 +45,7 @@ func NewRefdb(outdir, id, source, desc string, equal bool, ow bool, re bool) *Re
 	// Check if the output directory exists
 	_, err = os.Stat(outdir)
 	if os.IsNotExist(err) {
-		err = os.Mkdir(outdir, 770)
+		err = os.Mkdir(outdir, 0770)
 		if err == nil {
 			panic(err)
 		}
